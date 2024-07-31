@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "renaissancebot"
+version = "0.1.0"
+description = ""
+authors = ["Никита Кузнецов <nikkuzya21@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiogram = "^3.10.0"
+pydantic-settings = "^2.3.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
