@@ -3,3 +3,4 @@ from .create_db import create_db
 from .check_user_in_db import check_user_in_db
 from .create_triggers import create_triggers
 from .check_user_email_in_db import check_user_email_in_db
+from .update_user_email import update_user_email
