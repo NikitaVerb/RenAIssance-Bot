@@ -8,7 +8,7 @@ from aiogram.enums import ParseMode
 from renaissancebot.config_reader import config
 from renaissancebot.db import create_db, create_triggers
 from renaissancebot.handlers.auth_user import auth_user_start, update_email
-from renaissancebot.handlers.user import user_start, registration
+from renaissancebot.handlers.user import user_start, registration, utils, catalog
 
 
 
@@ -21,6 +21,8 @@ async def main():
     dp.include_router(user_start.router)
     dp.include_router(registration.router)
     dp.include_router(update_email.router)
+    dp.include_router(utils.router)
+    dp.include_router(catalog.router)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
