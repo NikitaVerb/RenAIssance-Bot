@@ -28,7 +28,7 @@ async def catalog_process(callback: CallbackQuery, bot: Bot):
                     " Самый частый выбор наших клиентов.")
         case 2:
             text = ("<b>UNICO - 2500/месяц.</b>\n\nИндивидуальный аккаунт, который будет доступен только вам."
-                    " Вы получите полный доступ к функционалу ChatGPT-4.")
+                    " Вы получите полный доступ к функционалу ChatGPT-4. Оставье заявку, чтобы приобрести.")
         case _:
             text = 'Произошла ошибка'
     await bot.edit_message_media(chat_id=callback.message.chat.id,

@@ -6,11 +6,10 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from renaissancebot.config_reader import config
-from renaissancebot.db import create_db, create_triggers
+from renaissancebot.db import create_db
 from renaissancebot.handlers.auth_user import auth_user_start, update_email
 from renaissancebot.handlers.user import user_start, registration, utils, catalog
-
-
+from renaissancebot.handlers.admin import add_account
 
 async def main():
     bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
@@ -23,6 +22,8 @@ async def main():
     dp.include_router(update_email.router)
     dp.include_router(utils.router)
     dp.include_router(catalog.router)
+    dp.include_router(add_account.router)
+
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
