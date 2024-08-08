@@ -7,9 +7,10 @@ from aiogram.enums import ParseMode
 
 from renaissancebot.config_reader import config
 from renaissancebot.db import create_db
+from renaissancebot.handlers.admin import add_account
 from renaissancebot.handlers.auth_user import auth_user_start, update_email
 from renaissancebot.handlers.user import user_start, registration, utils, catalog
-from renaissancebot.handlers.admin import add_account
+
 
 async def main():
     bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
@@ -31,4 +32,3 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(create_db())
     asyncio.run(main())
-    asyncio.run(create_triggers())

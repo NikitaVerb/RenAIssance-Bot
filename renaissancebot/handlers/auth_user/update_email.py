@@ -1,7 +1,7 @@
-from aiogram import Router
-from aiogram import types
 import logging
 
+from aiogram import Router
+from aiogram import types
 from aiogram.filters import Command
 from email_validator import EmailNotValidError, validate_email
 

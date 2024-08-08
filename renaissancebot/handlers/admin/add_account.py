@@ -3,9 +3,9 @@ import logging
 from aiogram import Router
 from aiogram import types
 from aiogram.filters import Command, CommandObject
-from db import add_account_to_db, check_account_in_db
 
 import renaissancebot.filters.user_rights
+from db import add_account_to_db, check_account_in_db
 
 router = Router()
 router.message.filter(renaissancebot.filters.user_rights.UserIsAdmin())
@@ -16,10 +16,8 @@ async def add_account(message: types.Message, command: CommandObject):
     try:
         # Проверяем, что команда содержит два аргумента (email и пароль)
         if not command.args or len(command.args.split()) != 2:
-
             await message.answer("Неправильный формат команды. Используйте: /add_account <email> <password>")
             return
-
 
         # Разделяем аргументы на email и пароль
         email, password = command.args.split()

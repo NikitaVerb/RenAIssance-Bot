@@ -1,3 +1,4 @@
+from aiogram import F
 from aiogram import Router
 from aiogram import types
 from aiogram.enums import ParseMode
@@ -5,7 +6,6 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from email_validator import validate_email, EmailNotValidError
-from aiogram import F
 
 import renaissancebot.filters.user_rights
 from db import add_user

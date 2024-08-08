@@ -1,5 +1,6 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
+
 from renaissancebot.db import check_user_in_db, check_user_is_admin
 
 

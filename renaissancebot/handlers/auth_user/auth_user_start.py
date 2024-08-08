@@ -17,7 +17,6 @@ async def cmd_start(message: types.Message):
         reply_markup=get_main_kb())
 
 
-
 @router.message(Command("start_registration"))
 async def start_registration(message: types.Message):
     await message.answer(
