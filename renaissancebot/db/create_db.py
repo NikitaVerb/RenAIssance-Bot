@@ -18,17 +18,23 @@ async def create_db():
         ''')
 
         # Создаем таблицу почт
-        await cursor.execute('''CREATE TABLE IF NOT EXISTS Emails(
-                                email TEXT PRIMARY KEY,
-                                password TEXT NOT NULL)''')
+        await cursor.execute('''
+            CREATE TABLE IF NOT EXISTS Emails (
+                email TEXT PRIMARY KEY,
+                password TEXT NOT NULL
+            )
+        ''')
 
         # Создаем таблицу связей пользователей и почт
-        await cursor.execute('''CREATE TABLE IF NOT EXISTS UserEmails(
-                                user_id INTEGER,
-                                email TEXT,
-                                FOREIGN KEY (user_id) REFERENCES Users (user_id),
-                                FOREIGN KEY (email) REFERENCES Emails (email),
-                                PRIMARY KEY (user_id, email))''')
+        await cursor.execute('''
+            CREATE TABLE IF NOT EXISTS UserEmails (
+                user_id INTEGER,
+                email TEXT,
+                FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE RESTRICT,
+                FOREIGN KEY (email) REFERENCES Emails (email) ON DELETE RESTRICT,
+                PRIMARY KEY (user_id, email)
+            )
+        ''')
 
         await cursor.execute('''CREATE TABLE IF NOT EXISTS Admins(
                                         user_id INTEGER PRIMARY KEY)''')
