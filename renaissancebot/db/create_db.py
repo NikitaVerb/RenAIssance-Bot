@@ -39,5 +39,4 @@ async def create_db():
         await cursor.execute('''CREATE TABLE IF NOT EXISTS Admins(
                                         user_id INTEGER PRIMARY KEY)''')
 
-
         await conn.commit()

@@ -6,3 +6,7 @@ from .check_user_in_db import check_user_in_db
 from .check_user_is_admin import check_user_is_admin
 from .create_db import create_db
 from .update_user_email import update_user_email
+from .unlink_user_from_account import unlink_user_from_account
+from .get_user_email import get_user_email
+from .unlink_all_users_from_account import unlink_all_users_from_account
+from .get_user_id import get_user_id
