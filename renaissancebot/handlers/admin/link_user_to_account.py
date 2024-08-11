@@ -36,12 +36,9 @@ async def link_user_to_account_handler(message: types.Message, command: CommandO
 
         # Проверяем, что аккаунт существует в базе данных
 
-
-        if check_link_exists(user_id, account_email):
+        if await check_link_exists(user_id, account_email):
             await message.answer("Такая связь уже существует")
             return
-
-
 
         # Проверяем, что пользователь существует в базе данных
         if not await check_user_email_in_db(user_email):
