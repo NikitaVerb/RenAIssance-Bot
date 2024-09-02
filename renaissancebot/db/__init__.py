@@ -16,3 +16,5 @@ from .get_most_linked_email_account import get_most_linked_email_account
 from .get_email_with_user_count import get_emails_with_user_count
 from .get_all_users import get_all_users
 from .get_user_account import get_user_account
+from .get_user_expiration_date import get_user_expiration_date
+from .get_account_password import get_account_password
