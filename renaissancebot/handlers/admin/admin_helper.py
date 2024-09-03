@@ -20,5 +20,7 @@ async def admin_helper(message: types.Message):
            f'/update_password - заменить пароль от аккаунта ChatGPT+\n'
            f'Используйте: /update_password <account_email> <new_password>\n\n'
            f'/delete_account - удаляет аккаунт из базы данных, если к аккаунту не привязаны пользователи\n'
-           f'Используйте: /delete_account <account_email>\n\n')
+           f'Используйте: /delete_account <account_email>\n\n'
+           f'/add_admin - добавляет админа по его user_id\n'
+           f'Используйте: /add_admin <admin_id>"')
     await message.answer(msg, parse_mode=None)
