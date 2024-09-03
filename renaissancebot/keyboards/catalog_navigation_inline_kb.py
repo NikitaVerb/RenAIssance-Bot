@@ -10,9 +10,9 @@ def catalog_navigation_inline_kb(total_page: int, page: int) -> InlineKeyboardMa
             kb = [
                 [InlineKeyboardButton(text=f"{page}/{total_page}", callback_data="pass"),
                  InlineKeyboardButton(text="➡️", callback_data=f'navigation_{page + 1}')],
-                [InlineKeyboardButton(text="1 месяц", callback_data=f'subscribe'),
-                 InlineKeyboardButton(text="2 месяца", callback_data=f'subscribe'),
-                 InlineKeyboardButton(text="3 месяца", callback_data=f'subscribe')]
+                [InlineKeyboardButton(text="1 месяц", callback_data=f'subscribe_1'),
+                 InlineKeyboardButton(text="3 месяца", callback_data=f'subscribe_3'),
+                 InlineKeyboardButton(text="6 месяца", callback_data=f'subscribe_6')]
             ]
             kb = InlineKeyboardMarkup(inline_keyboard=kb)
 
