@@ -7,6 +7,7 @@ async def get_most_linked_email_account() -> str:
             SELECT Emails.email
             FROM Emails
             LEFT JOIN UserEmails ON Emails.email = UserEmails.email
+            WHERE Emails.email NOT LIKE '%_ind'
             GROUP BY Emails.email
             HAVING COUNT(UserEmails.user_id) < 10
             ORDER BY COUNT(UserEmails.user_id) DESC, Emails.email ASC

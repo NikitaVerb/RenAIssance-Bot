@@ -50,7 +50,6 @@ async def link_user_to_account_handler(message: types.Message, command: CommandO
 
         # Отправляем сообщение о успешном отвязывании
         await message.answer("Пользователь успешно привязан к аккаунту")
-
     except Exception as e:
         # Обработка исключений и уведомление пользователя о проблеме
         await message.answer("Произошла ошибка при привязывании пользователя от аккаунта")

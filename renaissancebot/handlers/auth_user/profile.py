@@ -28,6 +28,8 @@ async def profile_handler(message: types.Message):
         password = 'нет действительного пароля от аккаунта ChatGPT'
         date_expiration = '-----------------'
 
+    if account_email.endswith('_ind'):
+        account_email = account_email[:-4]
     # Формируем и отправляем ответ
     cart = (f"Ваш email: {email}\n\n"
             f"Аккаунт ChatGPT: {account_email}\n\n"
