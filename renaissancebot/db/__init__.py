@@ -22,3 +22,4 @@ from .unlink_all_users_from_account import unlink_all_users_from_account
 from .unlink_user_from_account import unlink_user_from_account
 from .update_user_email import update_user_email
 from .get_inactive_user_count_by_email import get_inactive_user_count_by_email
+from .update_account_password import update_account_password

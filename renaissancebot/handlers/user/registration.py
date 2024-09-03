@@ -64,7 +64,9 @@ async def process_user_email(message: types.Message, state: FSMContext):
         else:
             await message.answer('Email принят. Обработка завершена.')
             await add_user(message.from_user.id, email)
-            await message.answer("Вы успешно зарегистрированы!", parse_mode=ParseMode.MARKDOWN)
+            await message.answer("Вы успешно зарегистрированы!\nВы можете открыть профиль командой /profile."
+                                 " Там после покупки подписки будет отображаться информация об аккаунте ChatGPT+",
+                                 parse_mode=ParseMode.MARKDOWN)
             await state.clear()
     except EmailNotValidError as e:
         # Если email невалидный, сообщаем об ошибке

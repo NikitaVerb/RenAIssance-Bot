@@ -16,5 +16,7 @@ async def admin_helper(message: types.Message):
            f'/link - привязывает юзера к аккаунту ChatGPT+\nИспользуйте: /link <account_email> <user_email>\n\n'
            f'/unlink - отвязывает юзера от аккаунта\nИспользуйте: /unlink <account_email> <user_email>'
            f'/profile - показывает ваш профиль как пользователя'
-           f'/start - запустить бота')
+           f'/start - запустить бота'
+           f'/update_password - заменить пароль от аккаунта ChatGPT+\n'
+           f'Используйте: /update_password <account_email> <new_password>')
     await message.answer(msg, parse_mode=None)
