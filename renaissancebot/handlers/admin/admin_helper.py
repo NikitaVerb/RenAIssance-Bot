@@ -14,9 +14,11 @@ async def admin_helper(message: types.Message):
            f'/get_users - присылает таблицу пользователей xls, на телефоне может открыть прошлую таблицу с таким названием\n\n'
            f'/get_accounts - присылвает сообщение с аккаунтами ChatGPT+\n\n'
            f'/link - привязывает юзера к аккаунту ChatGPT+\nИспользуйте: /link <account_email> <user_email>\n\n'
-           f'/unlink - отвязывает юзера от аккаунта\nИспользуйте: /unlink <account_email> <user_email>'
+           f'/unlink - отвязывает юзера от аккаунта\nИспользуйте: /unlink <account_email> <user_email>\n\n'
            f'/profile - показывает ваш профиль как пользователя'
            f'/start - запустить бота'
            f'/update_password - заменить пароль от аккаунта ChatGPT+\n'
-           f'Используйте: /update_password <account_email> <new_password>')
+           f'Используйте: /update_password <account_email> <new_password>\n\n'
+           f'/delete_account - удаляет аккаунт из базы данных, если к аккаунту не привязаны пользователи\n'
+           f'Используйте: /delete_account <account_email>\n\n')
     await message.answer(msg, parse_mode=None)

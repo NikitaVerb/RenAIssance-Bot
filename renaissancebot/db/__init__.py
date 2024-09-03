@@ -23,3 +23,5 @@ from .unlink_user_from_account import unlink_user_from_account
 from .update_user_email import update_user_email
 from .get_inactive_user_count_by_email import get_inactive_user_count_by_email
 from .update_account_password import update_account_password
+from .check_account_links import check_account_links
+from .delete_account_from_db import delete_account_from_db
