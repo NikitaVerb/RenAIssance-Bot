@@ -6,7 +6,7 @@ from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 import renaissancebot.filters.user_rights
 from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account
 from db import set_expiration_date, set_purchase_date, add_to_spent, check_user_in_db
-from keyboards import reg_inline_markup
+from keyboards import reg_inline_markup, back_to_menu_inline_kb
 
 router = Router()
 router.message.filter(renaissancebot.filters.user_rights.UserIsLogged())
@@ -80,9 +80,9 @@ def add_months(source_date, months):
 @router.message(F.successful_payment)
 async def success_payment(message: Message):
     amount = message.successful_payment.total_amount // 100  # Сумма в рублях
-    currency = message.successful_payment.currency
-    msg = (f'Спасибо за оплату {amount} {currency}!\n'
-           f'Откройте профиль командой /profile, там будет отображаться вся актуальная информация, аккаунт ChatGPT+ и пароль от аккаунта')
+    msg = (f'Успешная оплата. Спасибо за покупку!\n'
+           f'Откройте профиль, чтобы получить аккаунт.\n\n'
+           f'Подписывайтесь на телеграм-канал, чтобы оставаться в курсе событий.')
 
     # Извлечение количества месяцев из payload
     months = int(message.successful_payment.invoice_payload.split('_')[1])
@@ -114,4 +114,4 @@ async def success_payment(message: Message):
     # Обновление потраченной суммы (spent)
     await add_to_spent(message.from_user.id, amount)
 
-    await message.answer(msg)
+    await message.answer(msg, reply_markup=back_to_menu_inline_kb())
