@@ -3,14 +3,14 @@ import logging
 import aiosqlite
 
 
-async def unlink_user_from_account(user_id: int, email_account: str) -> None:
+async def unlink_user_from_account(user_id: int) -> None:
     try:
         async with aiosqlite.connect('renaissancebot.db') as db:
             # Явное использование курсора
             async with db.cursor() as cursor:
                 await cursor.execute(
-                    '''DELETE FROM UserEmails WHERE user_id = ? AND email = ?''',
-                    (user_id, email_account)
+                    '''DELETE FROM UserEmails WHERE user_id = ?''',
+                    (user_id,)
                 )
             # Фиксация изменений
             await db.commit()

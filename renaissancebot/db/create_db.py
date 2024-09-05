@@ -28,7 +28,7 @@ async def create_db():
         # Создаем таблицу связей пользователей и почт
         await cursor.execute('''
             CREATE TABLE IF NOT EXISTS UserEmails (
-                user_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL UNIQUE,
                 email TEXT NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE RESTRICT,
                 FOREIGN KEY (email) REFERENCES Emails (email) ON DELETE RESTRICT,

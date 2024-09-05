@@ -16,7 +16,8 @@ async def add_account(message: types.Message, command: CommandObject):
     try:
         # Проверяем, что команда содержит два аргумента (email и пароль)
         if not command.args or len(command.args.split()) != 2:
-            await message.answer("Неправильный формат команды. Используйте: /add_account <email> <password>")
+            await message.answer("Неправильный формат команды. Используйте: /add_account <email> <password>",
+                                 parse_mode=None)
             return
 
         # Разделяем аргументы на email и пароль
