@@ -47,8 +47,8 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
 
     # Формируем и отправляем ответ
     cart = (f"Ваш email: {email}\n\n"
-            f"Аккаунт ChatGPT: `{account_email}`\n\n"
-            f"Пароль от аккаунта: `{password}`\n\n"
+            f"Логин ChatGPT: `{account_email} (нажмите, чтобы скопировать)`\n\n"
+            f"Пароль от аккаунта: `{password}` (нажмите, чтобы скопировать)\n\n"
             f"Дата окончания подписки: {date_expiration}\n\n")
 
     await bot.edit_message_text(chat_id=message.chat.id,
