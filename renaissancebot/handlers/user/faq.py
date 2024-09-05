@@ -9,11 +9,13 @@ router = Router()
 @router.callback_query(F.data == "faq")
 async def faq_handler(callback: CallbackQuery):
     await callback.message.answer("Выберите тему для получения помощи:", reply_markup=faq_inline_kb())
+    await callback.answer()
 
 
 @router.callback_query(F.data.startswith('faq_'))
 async def faq_question(callback: CallbackQuery):
-    question = int(callback.data.split()[1])
+    await callback.answer()
+    question = int(callback.data.split('_')[1])
     match question:
         case 1:
             text = ("Мы предоставляем доступ к совместной платной подписке ChatGPT-4 (Plus)."
@@ -51,3 +53,4 @@ async def faq_question(callback: CallbackQuery):
             text = '12'
 
     await callback.message.answer(text)
+    await callback.answer()
