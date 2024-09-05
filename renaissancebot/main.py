@@ -10,7 +10,7 @@ from renaissancebot.db import create_db
 from renaissancebot.handlers.admin import add_account, unlink_from_account, link_user_to_account, get_accounts, \
     get_users, admin_helper, update_password, delete_account, add_admin
 from renaissancebot.handlers.auth_user import auth_user_start, update_email, profile, pay
-from renaissancebot.handlers.user import user_start, registration, utils, catalog, menu
+from renaissancebot.handlers.user import user_start, registration, utils, catalog, menu, faq
 
 
 async def main():
@@ -35,6 +35,7 @@ async def main():
     dp.include_router(delete_account.router)
     dp.include_router(add_admin.router)
     dp.include_router(menu.router)
+    dp.include_router(faq.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, skip_updates=False)
