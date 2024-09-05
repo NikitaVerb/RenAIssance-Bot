@@ -1,15 +1,16 @@
 from aiogram import Router, F, Bot
 from aiogram.enums import ParseMode
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto
+from aiogram.types import CallbackQuery
 
 from keyboards import catalog_navigation_inline_kb
 
 router = Router()
 
 
-@router.message(F.text == 'Каталог')
-async def catalog(message: Message):
-    await message.answer(
+@router.callback_query(F.data.startswith('catalog'))
+async def catalog(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.answer(
         '<b>DECA - 649/месяц.</b>\n\nCовместный аккаунт до 7 человек с ChatGPT-4 (Plus).'
         ' Активно модерируется, чтобы всем хватало запросов. Комфорт и эффективность в одном тарифе.',
         parse_mode=ParseMode.HTML, reply_markup=catalog_navigation_inline_kb(2, 1))
