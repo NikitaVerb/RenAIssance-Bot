@@ -1,9 +1,10 @@
 from aiogram import Router, F
 from aiogram import types
+from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from .menu import menu
-from keyboards import reg_inline_markup
+
 from filters.user_rights import UserIsLogged
+from keyboards import reg_inline_markup, main_inline_kb
 
 router = Router()
 
@@ -15,7 +16,8 @@ async def cmd_start(message: types.Message):
             f'Если хотите приобрести подписку или отслеживать статус уже купленной подписки,'
             f' то вам нужно зарегестрироваться'
             , reply_markup=reg_inline_markup())
-    await menu(message)
+    await message.answer('Выберите интересующий раздел👇🏻',
+                         parse_mode=ParseMode.MARKDOWN, reply_markup=main_inline_kb())
 
 
 @router.message(F.text == "Связаться")

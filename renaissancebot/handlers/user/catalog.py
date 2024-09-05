@@ -8,12 +8,12 @@ router = Router()
 
 
 @router.callback_query(F.data.startswith('catalog'))
-async def catalog(callback: CallbackQuery):
-    await callback.answer()
-    await callback.message.answer(
-        '<b>DECA - 649/месяц.</b>\n\nCовместный аккаунт до 7 человек с ChatGPT-4 (Plus).'
-        ' Активно модерируется, чтобы всем хватало запросов. Комфорт и эффективность в одном тарифе.',
-        parse_mode=ParseMode.HTML, reply_markup=catalog_navigation_inline_kb(2, 1))
+async def catalog(callback: CallbackQuery, bot: Bot):
+    await bot.edit_message_text(chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id, text=
+    '<b>DECA - 649/месяц.</b>\n\nCовместный аккаунт до 7 человек с ChatGPT-4 (Plus).'
+    ' Активно модерируется, чтобы всем хватало запросов. Комфорт и эффективность в одном тарифе.',
+                                parse_mode=ParseMode.HTML, reply_markup=catalog_navigation_inline_kb(2, 1))
 
 
 @router.callback_query(F.data.startswith("navigation_"))

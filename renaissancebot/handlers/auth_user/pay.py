@@ -17,10 +17,11 @@ router.message.filter(renaissancebot.filters.user_rights.UserIsLogged())
 async def order(callback: CallbackQuery, bot: Bot):
     await callback.answer()
     if not (await check_user_in_db(callback.from_user.id)):
-        await callback.message.answer(
-            f'Если хотите приобрести подписку или отслеживать статус уже купленной подписки,'
-            f' то вам нужно зарегистрироваться',
-            reply_markup=reg_inline_markup())
+        await bot.edit_message_text(chat_id=callback.message.chat.id,
+                                    message_id=callback.message.message_id, text=
+                                    f'Если хотите приобрести подписку или отслеживать статус уже купленной подписки,'
+                                    f' то вам нужно зарегистрироваться',
+                                    reply_markup=reg_inline_markup())
         return
 
     month = int(callback.data.split('_')[1])

@@ -1,4 +1,4 @@
-from aiogram import F
+from aiogram import F, Bot
 from aiogram import Router
 from aiogram import types
 from aiogram.enums import ParseMode
@@ -10,7 +10,7 @@ from email_validator import validate_email, EmailNotValidError
 import renaissancebot.filters.user_rights
 from db import add_user
 from db import check_user_email_in_db
-
+from keyboards import back_to_menu_inline_kb
 router = Router()
 router.message.filter(renaissancebot.filters.user_rights.UserIsNotLogged())
 
@@ -27,31 +27,34 @@ async def cancel_registration(message: types.Message, state: FSMContext):
     if current_state:
         await state.clear()
         await message.answer(
-            "Процесс регистрации был отменен. Вы можете начать регистрацию снова, отправив команду /start_registration.")
+            "Процесс регистрации был отменен.", reply_markup=back_to_menu_inline_kb())
     else:
         await message.answer("В данный момент нет активного процесса регистрации.")
 
 
 @router.message(StateFilter(None), Command("start_registration"))
-async def start_registration(message: types.Message, state: FSMContext):
-    await message.answer("Пожалуйста, введите ваш email:")
-    await message.answer("Вы можете остановить процесс регистрации, отправив команду /cancel")
+async def start_registration(message: types.Message, state: FSMContext, bot: Bot):
+    await bot.edit_message_text(chat_id=message.chat.id,
+                                message_id=message.message_id,
+                                text="Пожалуйста, введите ваш email.\nВы можете остановить процесс регистрации,"
+                                     " отправив команду /cancel")
     await state.set_state(RegistrationState.user_email)
 
 
 @router.callback_query(F.data.startswith("start_registration"))
-async def start_registration_callback(callback_query: types.CallbackQuery, state: FSMContext):
+async def start_registration_callback(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
     # Отправляем сообщение о начале регистрации
-    await callback_query.message.answer("Пожалуйста, введите ваш email:")
-    await callback_query.message.answer("Вы можете остановить процесс регистрации, отправив команду /cancel")
+    await bot.edit_message_text(chat_id=callback.message.chat.id,
+                                message_id=callback.message.message_id,
+                                text="Пожалуйста, введите ваш email.\nВы можете остановить процесс регистрации,"
+                                     " отправив команду /cancel")
     # Устанавливаем состояние регистрации
     await state.set_state(RegistrationState.user_email.state)
     # Удаляем сообщение с кнопкой
-    await callback_query.message.delete()
 
 
 @router.message(RegistrationState.user_email)
-async def process_user_email(message: types.Message, state: FSMContext):
+async def process_user_email(message: types.Message, state: FSMContext, bot: Bot):
     user_email = message.text
 
     try:
@@ -60,14 +63,13 @@ async def process_user_email(message: types.Message, state: FSMContext):
         # Если email валиден, возвращаем его
         email = valid.email
         if await check_user_email_in_db(email):
-            await message.answer("Пользователь с таким email уже существует")
+            await message.answer("Пользователь с таким email уже существует. Пожалуйста, введите корректный email:")
         else:
-            await message.answer('Email принят. Обработка завершена.')
             await add_user(message.from_user.id, email)
-            await message.answer("Вы успешно зарегистрированы!\nВы можете открыть профиль командой /profile."
-                                 " В нем отображается вся актуальная информация о подписке",
-                                 parse_mode=ParseMode.MARKDOWN)
+            await message.answer("Вы успешно зарегистрированы!\n"
+                                 "Теперь вы можете совершать покупки и следить за статусом подписок в профиле",
+                                 parse_mode=ParseMode.MARKDOWN, reply_markup=back_to_menu_inline_kb())
             await state.clear()
     except EmailNotValidError as e:
         # Если email невалидный, сообщаем об ошибке
-        await message.answer(f"Неверный формат email. Пожалуйста, введите корректный email. Ошибка: {str(e)}")
+        await message.answer(f"Неверный формат email. Пожалуйста, введите корректный email:")

@@ -1,20 +1,20 @@
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.types import CallbackQuery
 
-from keyboards import faq_inline_kb
+from keyboards import faq_inline_kb, back_to_faq_inline_kb
 
 router = Router()
 
 
 @router.callback_query(F.data == "faq")
-async def faq_handler(callback: CallbackQuery):
-    await callback.message.answer("Выберите тему для получения помощи:", reply_markup=faq_inline_kb())
-    await callback.answer()
+async def faq_handler(callback: CallbackQuery, bot: Bot):
+    await bot.edit_message_text(chat_id=callback.message.chat.id,
+                                message_id=callback.message.message_id, text="Выберите тему для получения помощи:",
+                                reply_markup=faq_inline_kb())
 
 
 @router.callback_query(F.data.startswith('faq_'))
-async def faq_question(callback: CallbackQuery):
-    await callback.answer()
+async def faq_question(callback: CallbackQuery, bot: Bot):
     question = int(callback.data.split('_')[1])
     match question:
         case 1:
@@ -52,5 +52,5 @@ async def faq_question(callback: CallbackQuery):
         case _:
             text = '12'
 
-    await callback.message.answer(text)
-    await callback.answer()
+    await bot.edit_message_text(chat_id=callback.message.chat.id,
+                                message_id=callback.message.message_id, text=text, reply_markup=back_to_faq_inline_kb())
