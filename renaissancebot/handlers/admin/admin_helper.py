@@ -13,7 +13,7 @@ async def admin_helper(message: types.Message):
     msg = (f'/add_account - добавляет аккаунт ChatGPT+\nИспользуйте: /add_account <email> <password>\n\n'
            f'/get_users - присылает таблицу пользователей xls, на телефоне может открыть прошлую таблицу с таким названием\n\n'
            f'/get_accounts - присылвает сообщение с аккаунтами ChatGPT+\n\n'
-           f'/link - привязывает юзера к аккаунту ChatGPT+\nИспользуйте: /link <account_email> <user_email>\n\n'
+           f'/link - привязывает юзера к аккаунту ChatGPT+\nИспользуйте: /link <account_email> <user_email> (<expiration_date>)\n\n'
            f'/unlink - отвязывает юзера от аккаунта\nИспользуйте: /unlink <account_email> <user_email>\n\n'
            f'/profile - показывает ваш профиль как пользователя'
            f'/start - запустить бота'

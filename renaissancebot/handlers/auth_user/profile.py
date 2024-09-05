@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from aiogram import Router, types, F
+from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery
 
@@ -60,8 +61,8 @@ async def profile_handler(message: types.Message, user_id: int):
 
     # Формируем и отправляем ответ
     cart = (f"Ваш email: {email}\n\n"
-            f"Аккаунт ChatGPT: {account_email}\n\n"
-            f"Пароль от аккаунта: {password}\n\n"
+            f"Аккаунт ChatGPT: `{account_email}`\n\n"
+            f"Пароль от аккаунта: `{password}`\n\n"
             f"Дата окончания подписки: {date_expiration}\n\n")
 
-    await message.answer(cart, reply_markup=back_to_menu_inline_kb())
+    await message.answer(cart, reply_markup=back_to_menu_inline_kb(), parse_mode=ParseMode.MARKDOWN)
