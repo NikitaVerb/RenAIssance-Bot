@@ -1,11 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiogram import Router, types, F, Bot
 from aiogram.enums import ParseMode
 from aiogram.types import CallbackQuery
 
-from db import get_user_email, get_user_account, get_user_expiration_date, get_account_password, check_user_in_db
-from keyboards import back_to_menu_inline_kb, reg_inline_markup
+from db import get_user_email, get_user_account, get_user_expiration_date, get_account_password, check_user_in_db, \
+    get_used_backup_account_date, get_user_backup_account, get_backup_account_password, unlink_user_from_backup_account, \
+    check_user_in_db, check_user_backup_account
+from keyboards import reg_inline_markup, profile_inline_kb
+from keyboards.profile_inline_kb import profile_inline_kb
 
 router = Router()
 
@@ -26,6 +29,8 @@ async def profile(callback: CallbackQuery, bot: Bot):
 # Основная функция для обработки профиля
 async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     # Получаем данные пользователя
+    backup_account_button: bool = True
+    backup_account_inf: str = ''
     email = await get_user_email(user_id)
     account_email = await get_user_account(user_id)
     if account_email:
@@ -36,6 +41,8 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     else:
         text_account_email = 'у вас нет аккаунта ChatGPT'
     date_expiration = await get_user_expiration_date(user_id)
+    if not date_expiration or datetime.strptime(date_expiration.strip(), '%Y-%m-%d').date() < datetime.now().date():
+        backup_account_button = False
 
     # Проверяем дату окончания подписки
     password = None  # Инициализируем пароль по умолчанию
@@ -44,6 +51,17 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
         if expiration_date > datetime.now().date():
             # Подписка действительна, получаем пароль
             password = await get_account_password(account_email)
+            # Получаем дату последнего запроса к резервному аккаунту
+            used_backup_account_date = await get_used_backup_account_date(user_id)
+            if used_backup_account_date:
+                used_backup_account_date = datetime.strptime(used_backup_account_date.strip(), '%Y-%m-%d %H:%M:%S')
+                if used_backup_account_date + timedelta(days=3) > datetime.now():
+                    backup_account_button = False
+                if await check_user_backup_account(user_id):
+                    email_backup_account = await get_user_backup_account(user_id)
+                    backup_account_password = await get_backup_account_password(email_backup_account)
+                    backup_account_inf = (f"\n\nЛогин резервного аккаунта `{email_backup_account or ''}`\n\n"
+                                          f"Пароль от резервного аккаунта `{backup_account_password or ''}`")
     else:
         date_expiration = 'Вы ещё не оформляли подписку'
 
@@ -59,8 +77,11 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
 
     # Дата окончания подписки
     cart += f"Дата окончания подписки: {date_expiration}\n\n"
-
+    cart += backup_account_inf
     # Отправляем сообщение
     await bot.edit_message_text(chat_id=message.chat.id,
-                                message_id=message.message_id, text=cart, reply_markup=back_to_menu_inline_kb(),
+                                message_id=message.message_id, text=cart,
+                                reply_markup=profile_inline_kb(backup_account_button),
                                 parse_mode=ParseMode.MARKDOWN)
+
+

@@ -5,15 +5,17 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
+from filters.setup_scheduler import setup_scheduler
 from renaissancebot.config_reader import config
 from renaissancebot.db import create_db
 from renaissancebot.handlers.admin import add_account, unlink_from_account, link_user_to_account, get_accounts, \
     get_users, admin_helper, update_password, delete_account, add_admin
-from renaissancebot.handlers.auth_user import auth_user_start, update_email, profile, pay
+from renaissancebot.handlers.auth_user import auth_user_start, update_email, profile, pay, backup_account
 from renaissancebot.handlers.user import user_start, registration, utils, catalog, menu, faq
 
 
 async def main():
+    setup_scheduler()
     bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     logging.basicConfig(level=logging.DEBUG)
     dp = Dispatcher()
@@ -36,6 +38,7 @@ async def main():
     dp.include_router(add_admin.router)
     dp.include_router(menu.router)
     dp.include_router(faq.router)
+    dp.include_router(backup_account.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, skip_updates=False)

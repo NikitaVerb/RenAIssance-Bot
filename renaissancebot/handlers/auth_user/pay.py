@@ -27,6 +27,11 @@ async def order(callback: CallbackQuery, bot: Bot):
     month = int(callback.data.split('_')[1])
     price = 0
     description = ''
+    if not (await get_most_linked_email_account()):
+        await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id,
+                                    text="Извините, к сожалению, у нас сейчас нет свободных аккаунтов",
+                                    reply_markup=back_to_menu_inline_kb())
+        return
     match month:
         case 1:
             price = 10000

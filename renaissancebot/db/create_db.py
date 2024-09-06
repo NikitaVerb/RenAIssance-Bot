@@ -13,6 +13,7 @@ async def create_db():
                 purchase_date DATE DEFAULT NULL,
                 expiration_date DATE DEFAULT NULL,
                 spent INTEGER DEFAULT 0 NOT NULL,
+                used_backup_account DATE DEFAULT NULL,
                 CHECK (purchase_date IS NULL OR expiration_date IS NULL OR purchase_date <= expiration_date)
             )
         ''')
@@ -38,5 +39,24 @@ async def create_db():
 
         await cursor.execute('''CREATE TABLE IF NOT EXISTS Admins(
                                         user_id INTEGER PRIMARY KEY)''')
+
+        # Создаем таблицу резервных аккаунтов
+        await cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS BackupAccounts (
+                        email TEXT PRIMARY KEY,
+                        password TEXT NOT NULL
+                    )
+                ''')
+
+        await cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS UserBackupAccounts (
+                        user_id INTEGER NOT NULL UNIQUE,
+                        email TEXT NOT NULL,
+                        link_date DATE DEFAULT NULL,
+                        FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE RESTRICT,
+                        FOREIGN KEY (email) REFERENCES BackupAccounts (email) ON DELETE RESTRICT,
+                        PRIMARY KEY (user_id, email)
+                    )
+                ''')
 
         await conn.commit()
