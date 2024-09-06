@@ -27,30 +27,40 @@ async def profile(callback: CallbackQuery, bot: Bot):
 async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     # Получаем данные пользователя
     email = await get_user_email(user_id)
-    account_email = await get_user_account(user_id) or 'у вас нет аккаунта ChatGPT'
+    account_email = await get_user_account(user_id)
+    if account_email:
+        # Убираем "_ind" из названия аккаунта, если это индивидуальный аккаунт
+        if account_email.endswith('_ind'):
+            account_email = account_email[:-4]
+        text_account_email = f'`{account_email}` (нажмите, чтобы скопировать)'
+    else:
+        text_account_email = 'у вас нет аккаунта ChatGPT'
     date_expiration = await get_user_expiration_date(user_id)
 
     # Проверяем дату окончания подписки
+    password = None  # Инициализируем пароль по умолчанию
     if date_expiration:
         expiration_date = datetime.strptime(date_expiration.strip(), '%Y-%m-%d').date()
         if expiration_date > datetime.now().date():
+            # Подписка действительна, получаем пароль
             password = await get_account_password(account_email)
-        else:
-            password = 'нет действительного пароля от аккаунта ChatGPT'
     else:
-        password = 'нет действительного пароля от аккаунта ChatGPT'
-        date_expiration = '-----------------'
+        date_expiration = 'Вы ещё не оформляли подписку'
 
-    # Убираем "_ind" из названия аккаунта, если это индивидуальный аккаунт
-    if account_email.endswith('_ind'):
-        account_email = account_email[:-4]
+    # Формируем ответ
+    cart = f"Ваш email: {email}\n\n"
+    cart += f"Логин ChatGPT: {text_account_email}\n\n"  # Логин всегда показывается
 
-    # Формируем и отправляем ответ
-    cart = (f"Ваш email: {email}\n\n"
-            f"Логин ChatGPT: `{account_email}` (нажмите, чтобы скопировать)\n\n"
-            f"Пароль от аккаунта: `{password}` (нажмите, чтобы скопировать)\n\n"
-            f"Дата окончания подписки: {date_expiration}\n\n")
+    # Добавляем пароль, если он есть
+    if password:
+        cart += f"Пароль от аккаунта: `{password}` (нажмите, чтобы скопировать)\n\n"
+    else:
+        cart += "Пароль от аккаунта: нет действительного пароля от аккаунта ChatGPT\n\n"
 
+    # Дата окончания подписки
+    cart += f"Дата окончания подписки: {date_expiration}\n\n"
+
+    # Отправляем сообщение
     await bot.edit_message_text(chat_id=message.chat.id,
                                 message_id=message.message_id, text=cart, reply_markup=back_to_menu_inline_kb(),
                                 parse_mode=ParseMode.MARKDOWN)
