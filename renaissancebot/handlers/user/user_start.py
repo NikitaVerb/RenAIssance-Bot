@@ -14,7 +14,7 @@ async def cmd_start(message: types.Message):
     if not UserIsLogged():
         await message.answer(
             f'Если хотите приобрести подписку или отслеживать статус уже купленной подписки,'
-            f' то вам нужно зарегестрироваться'
+            f' то вам нужно зарегистрироваться'
             , reply_markup=reg_inline_markup())
     await message.answer('Выберите интересующий раздел👇🏻',
                          parse_mode=ParseMode.MARKDOWN, reply_markup=main_inline_kb())

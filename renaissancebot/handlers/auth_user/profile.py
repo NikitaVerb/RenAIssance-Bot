@@ -17,7 +17,7 @@ async def profile(callback: CallbackQuery, bot: Bot):
         await bot.edit_message_text(chat_id=callback.message.chat.id,
                                     message_id=callback.message.message_id, text=
                                     f'Если хотите приобрести подписку или отслеживать статус уже купленной подписки,'
-                                    f' то вам нужно зарегестрироваться'
+                                    f' то вам нужно зарегистрироваться'
                                     , reply_markup=reg_inline_markup())
         return
     await profile_handler(callback.message, callback.from_user.id, bot)
