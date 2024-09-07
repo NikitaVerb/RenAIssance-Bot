@@ -39,3 +39,5 @@ from db.user_backup_accounts.set_link_date import set_link_date
 from db.user_backup_accounts.check_user_backup_account import check_user_backup_account
 from .backup_accounts.add_backup_accounts_or_update_password import add_backup_account_or_update_password
 from .backup_accounts.is_backup_account import is_backup_account
+from .backup_accounts.delete_backup_account_from_dp import delete_backup_account_from_db
+from .user_backup_accounts.check_backup_account_links import check_backup_account_links
