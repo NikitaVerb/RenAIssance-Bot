@@ -4,9 +4,9 @@ from aiogram import Router, types, F, Bot
 from aiogram.enums import ParseMode
 from aiogram.types import CallbackQuery
 
-from db import get_user_email, get_user_account, get_user_expiration_date, get_account_password, check_user_in_db, \
-    get_used_backup_account_date, get_user_backup_account, get_backup_account_password, unlink_user_from_backup_account, \
-    check_user_in_db, check_user_backup_account
+from db import get_user_email, get_user_account, get_user_expiration_date, get_account_password, \
+    get_used_backup_account_date, get_user_backup_account, get_backup_account_password, check_user_in_db, \
+    check_user_backup_account
 from keyboards import reg_inline_markup, profile_inline_kb
 from keyboards.profile_inline_kb import profile_inline_kb
 
@@ -60,28 +60,26 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
                 if await check_user_backup_account(user_id):
                     email_backup_account = await get_user_backup_account(user_id)
                     backup_account_password = await get_backup_account_password(email_backup_account)
-                    backup_account_inf = (f"\n\nЛогин резервного аккаунта `{email_backup_account or ''}`\n\n"
-                                          f"Пароль от резервного аккаунта `{backup_account_password or ''}`")
+                    backup_account_inf = (f"\n**Логин резервного аккаунта:** `{email_backup_account or ''}`\n\n"
+                                          f"**Пароль от резервного аккаунта:** `{backup_account_password or ''}`")
     else:
         date_expiration = 'Вы ещё не оформляли подписку'
 
     # Формируем ответ
-    cart = f"Ваш email: {email}\n\n"
-    cart += f"Логин ChatGPT: {text_account_email}\n\n"  # Логин всегда показывается
+    cart = f"**Ваш email:** {email}\n\n"
+    cart += f"**Логин ChatGPT:** {text_account_email}\n\n"  # Логин всегда показывается
 
     # Добавляем пароль, если он есть
     if password:
-        cart += f"Пароль от аккаунта: `{password}` (нажмите, чтобы скопировать)\n\n"
+        cart += f"**Пароль от аккаунта:** `{password}` (нажмите, чтобы скопировать)\n\n"
     else:
-        cart += "Пароль от аккаунта: нет действительного пароля от аккаунта ChatGPT\n\n"
+        cart += "**Пароль от аккаунта:** нет действительного пароля от аккаунта ChatGPT\n\n"
 
     # Дата окончания подписки
-    cart += f"Дата окончания подписки: {date_expiration}\n\n"
+    cart += f"**Дата окончания подписки:** {date_expiration}\n"
     cart += backup_account_inf
     # Отправляем сообщение
     await bot.edit_message_text(chat_id=message.chat.id,
                                 message_id=message.message_id, text=cart,
                                 reply_markup=profile_inline_kb(backup_account_button),
                                 parse_mode=ParseMode.MARKDOWN)
-
-
