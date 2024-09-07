@@ -5,7 +5,8 @@ from aiogram import types
 from aiogram.filters import Command, CommandObject
 
 import renaissancebot.filters.user_rights
-from db import update_account_password, get_current_users_on_account
+from db import update_account_password, get_current_users_on_account, is_backup_account, \
+    add_backup_account_or_update_password
 from keyboards import back_to_menu_inline_kb
 
 router = Router()
@@ -30,14 +31,19 @@ async def update_password(message: types.Message, command: CommandObject, bot: B
 
     account_email, new_password = args
 
-    # Обновляем пароль в базе данных
-    await update_account_password(account_email, new_password)
-    await message.answer(f"Пароль для {account_email} успешно обновлен.")
-
-    users = await get_current_users_on_account(account_email)
-
-    # Отправляем уведомление всем пользователям параллельно
-    if users:
-        await asyncio.gather(*[send_password_change_message(int(user_id[0]), bot) for user_id in users])
+    # Проверяем, является ли аккаунт резервным
+    if await is_backup_account(account_email):
+        # Если это резервный аккаунт, обновляем его пароль
+        await add_backup_account_or_update_password(account_email, new_password)
+        await message.answer(f"Пароль для резервного аккаунта {account_email} успешно обновлен.")
     else:
-        await message.answer("Нет пользователей, привязанных к этому аккаунту.")
+        # Если это обычный аккаунт, обновляем его пароль в основной таблице
+        await update_account_password(account_email, new_password)
+        await message.answer(f"Пароль для {account_email} успешно обновлен.")
+
+        # Отправляем уведомления всем пользователям, привязанным к этому аккаунту
+        users = await get_current_users_on_account(account_email)
+        if users:
+            await asyncio.gather(*[send_password_change_message(int(user_id[0]), bot) for user_id in users])
+        else:
+            await message.answer("Нет пользователей, привязанных к этому аккаунту.")
