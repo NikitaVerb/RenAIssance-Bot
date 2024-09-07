@@ -1,6 +1,6 @@
 from db.emails.add_account_to_db import add_account_to_db
 from db.user_emails.add_link_user_to_account import add_link_user_to_account
-from db.users.add_to_spent import add_to_spent
+from db.users.add_to_users_spent import add_to_users_spent
 from db.users.add_user import add_user
 from db.emails.check_account_in_db import check_account_in_db
 from db.user_emails.check_link_exists import check_link_exists

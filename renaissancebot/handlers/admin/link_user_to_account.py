@@ -6,7 +6,7 @@ from aiogram.filters import Command, CommandObject
 
 import renaissancebot.filters.user_rights
 from db import check_account_in_db, check_user_email_in_db, get_user_id, \
-    add_link_user_to_account, check_link_exists, set_expiration_date, set_purchase_date, \
+    add_link_user_to_account, set_expiration_date, set_purchase_date, \
     get_user_expiration_date, unlink_user_from_account
 
 router = Router()
@@ -64,7 +64,6 @@ async def link_user_to_account_handler(message: types.Message, command: CommandO
             await message.answer("Пользователь с таким email не найден")
             return
         user_id = int(user_id)
-
 
         # Проверяем, существует ли email пользователя в базе
         if not await check_user_email_in_db(user_email):

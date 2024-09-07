@@ -5,7 +5,7 @@ from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 
 import renaissancebot.filters.user_rights
 from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account
-from db import set_expiration_date, set_purchase_date, add_to_spent, check_user_in_db
+from db import set_expiration_date, set_purchase_date, add_to_users_spent, check_user_in_db
 from keyboards import reg_inline_markup, back_to_menu_inline_kb
 
 router = Router()
@@ -118,6 +118,6 @@ async def success_payment(message: Message):
     await set_purchase_date(message.from_user.id, str(purchase_date))
 
     # Обновление потраченной суммы (spent)
-    await add_to_spent(message.from_user.id, amount)
+    await add_to_users_spent(message.from_user.id, amount)
 
     await message.answer(msg, reply_markup=back_to_menu_inline_kb())

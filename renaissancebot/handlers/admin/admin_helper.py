@@ -23,5 +23,7 @@ async def admin_helper(message: types.Message):
            f'/delete_account - удаляет аккаунт из базы данных, если к аккаунту не привязаны пользователи\n'
            f'Используйте: /delete_account <account_email>\n\n'
            f'/add_admin - добавляет админа по его user_id\n'
-           f'Используйте: /add_admin <admin_id>"')
+           f'Используйте: /add_admin <admin_id>"\n\n'
+           f'/add_spend - Добавляет деньги к уже потраченным средствам пользователя.\n'
+           f'Используйте: /add_spend <user_email> <amount>')
     await message.answer(msg, parse_mode=None)
