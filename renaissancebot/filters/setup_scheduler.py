@@ -12,7 +12,7 @@ def setup_scheduler(bot: Bot):
     # Добавляем задачу, которая будет запускаться каждые 24 часа
     scheduler.add_job(remove_old_backup_accounts, 'interval', hours=1)
     scheduler.add_job(send_expiry_notifications, 'interval', hours=1, args=[bot])
-    scheduler.add_job(backup_database, 'interval', seconds=60)
+    scheduler.add_job(backup_database, 'interval', days=3)
 
     # Запускаем планировщик
     scheduler.start()
