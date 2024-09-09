@@ -7,12 +7,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from email_validator import validate_email, EmailNotValidError
 
-import renaissancebot.filters.user_rights
+import filters.user_rights
 from db import add_user
 from db import check_user_email_in_db
 from keyboards import back_to_menu_inline_kb
 router = Router()
-router.message.filter(renaissancebot.filters.user_rights.UserIsNotLogged())
+router.message.filter(filters.user_rights.UserIsNotLogged())
 
 
 class RegistrationState(StatesGroup):

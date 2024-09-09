@@ -3,7 +3,7 @@ import aiosqlite
 
 
 async def add_to_users_spent(user_id: int, amount: int):
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         await db.execute('''
             UPDATE Users
             SET spent = spent + ?

@@ -4,11 +4,11 @@ from aiogram import Router
 from aiogram import types
 from aiogram.filters import Command, CommandObject
 
-import renaissancebot.filters.user_rights
+from filters.user_rights import UserIsAdmin
 from db import add_account_to_db, add_backup_account_or_update_password, check_account_in_db
 
 router = Router()
-router.message.filter(renaissancebot.filters.user_rights.UserIsAdmin())
+router.message.filter(UserIsAdmin())
 
 
 @router.message(Command('add_account'))

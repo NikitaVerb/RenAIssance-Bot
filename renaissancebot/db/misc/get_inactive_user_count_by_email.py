@@ -4,7 +4,7 @@ import aiosqlite
 
 
 async def get_inactive_user_count_by_email(email: str) -> int:
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         # Получаем текущую дату
         current_date = datetime.now().date()
 

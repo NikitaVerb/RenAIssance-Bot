@@ -3,7 +3,7 @@ import aiosqlite
 
 async def add_user_backup_account(user_id: int, email: str):
     # Подключаемся к базе данных
-    async with aiosqlite.connect('renaissancebot.db') as conn:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as conn:
         cursor = await conn.cursor()
 
         # Выполняем SQL-запрос для вставки данных в таблицу UserBackupAccounts

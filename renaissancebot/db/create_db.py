@@ -2,7 +2,7 @@ import aiosqlite
 
 
 async def create_db():
-    async with aiosqlite.connect('renaissancebot.db') as conn:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as conn:
         cursor = await conn.cursor()
 
         # Создаем таблицу пользователей

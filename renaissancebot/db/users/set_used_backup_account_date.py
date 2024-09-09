@@ -5,7 +5,7 @@ import aiosqlite
 
 async def set_backup_account_date(user_id: int, backup_date: str):
     # Подключаемся к базе данных
-    async with aiosqlite.connect('renaissancebot.db') as conn:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as conn:
         cursor = await conn.cursor()
 
         # Выполняем SQL-запрос для обновления даты в таблице UserBackupAccounts

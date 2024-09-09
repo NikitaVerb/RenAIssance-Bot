@@ -4,7 +4,7 @@ import aiosqlite
 
 # Функция для удаления связи с резервным аккаунтом, если прошло более 24 часов
 async def remove_old_backup_accounts():
-    async with aiosqlite.connect('renaissancebot.db') as conn:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as conn:
         cursor = await conn.cursor()
 
         # Текущая дата и время

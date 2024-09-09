@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from aiogram import Bot, Router, F
 from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 
-import renaissancebot.filters.user_rights
+import filters.user_rights
 from config_reader import config
 from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account
 from db import set_expiration_date, set_purchase_date, add_to_users_spent, check_user_in_db
@@ -11,7 +11,7 @@ from db.users.set_notified import set_notified
 from keyboards import reg_inline_markup, back_to_menu_inline_kb
 
 router = Router()
-router.message.filter(renaissancebot.filters.user_rights.UserIsLogged())
+router.message.filter(filters.user_rights.UserIsLogged())
 
 
 # Обработчик команды для оформления заказа

@@ -2,7 +2,7 @@ import aiosqlite
 
 
 async def check_user_backup_account(user_id: int) -> bool:
-    async with aiosqlite.connect('renaissancebot.db') as conn:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as conn:
         cursor = await conn.cursor()
 
         # Выполняем запрос на проверку существования записи по user_id

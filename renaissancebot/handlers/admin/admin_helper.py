@@ -2,10 +2,10 @@ from aiogram import Router
 from aiogram import types
 from aiogram.filters import Command
 
-import renaissancebot.filters.user_rights
+import filters.user_rights
 
 router = Router()
-router.message.filter(renaissancebot.filters.user_rights.UserIsAdmin())
+router.message.filter(filters.user_rights.UserIsAdmin())
 
 
 @router.message(Command('help'))

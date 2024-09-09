@@ -2,7 +2,7 @@ import aiosqlite
 
 
 async def get_most_linked_email_account() -> str:
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         async with db.execute('''
             SELECT Emails.email
             FROM Emails

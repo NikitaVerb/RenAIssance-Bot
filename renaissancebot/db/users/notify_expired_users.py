@@ -3,7 +3,7 @@ import aiosqlite
 
 
 async def notify_expired_users():
-    async with aiosqlite.connect('renaissancebot.db') as conn:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as conn:
         cursor = await conn.cursor()
 
         # Текущая дата

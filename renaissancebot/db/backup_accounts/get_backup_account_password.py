@@ -3,7 +3,7 @@ import aiosqlite
 
 async def get_backup_account_password(email):
     # Подключаемся к базе данных асинхронно
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         # Выполняем SQL-запрос для получения пароля по email
         async with db.execute('SELECT password FROM BackupAccounts WHERE email = ?', (email,)) as cursor:
             # Извлекаем результат

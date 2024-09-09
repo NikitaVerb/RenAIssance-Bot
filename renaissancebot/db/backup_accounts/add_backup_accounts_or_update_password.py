@@ -3,7 +3,7 @@ import aiosqlite
 
 async def add_backup_account_or_update_password(email: str, password: str):
     # Подключаемся к базе данных
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         # Выполняем SQL запрос на добавление аккаунта в таблицу BackupAccounts
         await db.execute('''
             INSERT INTO BackupAccounts (email, password)

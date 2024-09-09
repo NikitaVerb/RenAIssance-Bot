@@ -4,13 +4,13 @@ from aiogram import Router, Bot
 from aiogram import types
 from aiogram.filters import Command, CommandObject
 
-import renaissancebot.filters.user_rights
+import filters.user_rights
 from db import update_account_password, get_current_users_on_account, is_backup_account, \
     add_backup_account_or_update_password
 from keyboards import back_to_menu_inline_kb
 
 router = Router()
-router.message.filter(renaissancebot.filters.user_rights.UserIsAdmin())
+router.message.filter(filters.user_rights.UserIsAdmin())
 
 
 async def send_password_change_message(user_id: int, bot: Bot):

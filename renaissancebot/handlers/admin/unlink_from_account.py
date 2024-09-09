@@ -3,12 +3,12 @@ import logging
 from aiogram import Router, types
 from aiogram.filters import Command, CommandObject
 
-import renaissancebot.filters.user_rights
+import filters.user_rights
 from db import check_account_in_db, check_user_email_in_db, unlink_user_from_account, get_user_id, \
     unlink_all_users_from_account
 
 router = Router()
-router.message.filter(renaissancebot.filters.user_rights.UserIsAdmin())
+router.message.filter(filters.user_rights.UserIsAdmin())
 
 
 @router.message(Command('unlink'))

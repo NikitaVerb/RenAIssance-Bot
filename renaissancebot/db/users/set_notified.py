@@ -3,7 +3,7 @@ import aiosqlite
 
 
 async def set_notified(user_id: int, notified: int):
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         await db.execute('''
             UPDATE Users
             SET notified = ?

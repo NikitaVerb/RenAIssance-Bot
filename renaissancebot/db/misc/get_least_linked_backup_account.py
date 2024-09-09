@@ -2,7 +2,7 @@ import aiosqlite
 
 
 async def get_least_linked_backup_account() -> str:
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         async with db.execute('''
             SELECT BackupAccounts.email
             FROM BackupAccounts

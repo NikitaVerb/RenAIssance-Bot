@@ -4,14 +4,14 @@ from datetime import datetime
 from aiogram import Router, types
 from aiogram.filters import Command, CommandObject
 
-import renaissancebot.filters.user_rights
+import filters.user_rights
 from db import check_account_in_db, check_user_email_in_db, get_user_id, \
     add_link_user_to_account, set_expiration_date, set_purchase_date, \
     get_user_expiration_date, unlink_user_from_account
 from db.users.set_notified import set_notified
 
 router = Router()
-router.message.filter(renaissancebot.filters.user_rights.UserIsAdmin())
+router.message.filter(filters.user_rights.UserIsAdmin())
 
 
 @router.message(Command('link'))

@@ -4,7 +4,7 @@ import aiosqlite
 
 
 async def get_backup_accounts_with_user_count():
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         async with db.execute('''
             SELECT BackupAccounts.email, BackupAccounts.password, COUNT(UserBackupAccounts.user_id) AS user_count
             FROM BackupAccounts

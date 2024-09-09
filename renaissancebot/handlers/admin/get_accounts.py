@@ -3,11 +3,11 @@ from aiogram import types
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
 
-import renaissancebot.filters.user_rights
+import filters.user_rights
 from db import get_emails_with_user_count, get_inactive_user_count_by_email
 
 router = Router()
-router.message.filter(renaissancebot.filters.user_rights.UserIsAdmin())
+router.message.filter(filters.user_rights.UserIsAdmin())
 
 
 @router.message(Command('get_accounts'))

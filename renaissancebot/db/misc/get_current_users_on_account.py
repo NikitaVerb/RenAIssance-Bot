@@ -4,7 +4,7 @@ import aiosqlite
 
 
 async def get_current_users_on_account(email: str):
-    async with aiosqlite.connect('renaissancebot.db') as conn:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as conn:
         cursor = await conn.cursor()
 
         # Текущая дата

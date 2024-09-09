@@ -2,7 +2,7 @@ import aiosqlite
 
 
 async def update_account_password(email: str, new_password: str) -> None:
-    async with aiosqlite.connect('renaissancebot.db') as db:
+    async with aiosqlite.connect('../Data/renaissancebot.db') as db:
         # Обновляем пароль для указанного email
         await db.execute('''
             UPDATE Emails
