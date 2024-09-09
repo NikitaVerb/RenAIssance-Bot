@@ -18,7 +18,7 @@ async def main():
 
     bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     setup_scheduler(bot)
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     dp = Dispatcher()
     dp.include_router(admin_helper.router)
     dp.include_router(auth_user_start.router)

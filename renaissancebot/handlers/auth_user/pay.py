@@ -4,6 +4,7 @@ from aiogram import Bot, Router, F
 from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 
 import renaissancebot.filters.user_rights
+from config_reader import config
 from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account
 from db import set_expiration_date, set_purchase_date, add_to_users_spent, check_user_in_db
 from db.users.set_notified import set_notified
@@ -48,7 +49,7 @@ async def order(callback: CallbackQuery, bot: Bot):
         title='Покупка подписки',
         description=description,
         payload=f'subscription_{month}_months',  # Уникальный идентификатор платежа с количеством месяцев
-        provider_token='381764678:TEST:93996',  # Тестовый токен платежного провайдера
+        provider_token=config.provider_token.get_secret_value(),  # Тестовый токен платежного провайдера
         currency='RUB',
         prices=[
             LabeledPrice(
