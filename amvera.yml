@@ -2,11 +2,10 @@ meta:
   environment: python
   toolchain:
     name: pip
-    version: "3.8"
+    version: "3.10"
 build:
   requirementsPath: requirements.txt
 run:
-  persistenceMount: /data
-  containerPort: "80"
-  servicePort: "80"
+  persistenceMount: /Data
+  containerPort: 80
   command: python renaissancebot/main.py
