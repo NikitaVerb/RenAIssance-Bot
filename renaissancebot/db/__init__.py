@@ -43,3 +43,5 @@ from .backup_accounts.delete_backup_account_from_dp import delete_backup_account
 from .user_backup_accounts.check_backup_account_links import check_backup_account_links
 from .user_backup_accounts.get_user_from_user_backup_accounts import get_user_from_user_backup_account
 from .backup_accounts.get_backup_accounts_with_count_user import get_backup_accounts_with_user_count
+from .users.set_notified import set_notified
+from .users.notify_expired_users import notify_expired_users

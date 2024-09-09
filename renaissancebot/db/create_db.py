@@ -14,6 +14,7 @@ async def create_db():
                 expiration_date DATE DEFAULT NULL,
                 spent INTEGER DEFAULT 0 NOT NULL,
                 used_backup_account DATETIME DEFAULT NULL,
+                notified INTEGER,
                 CHECK (purchase_date IS NULL OR expiration_date IS NULL OR purchase_date <= expiration_date)
             )
         ''')

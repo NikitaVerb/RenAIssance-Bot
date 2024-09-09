@@ -15,8 +15,9 @@ from renaissancebot.handlers.user import user_start, registration, utils, catalo
 
 
 async def main():
-    setup_scheduler()
+
     bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    setup_scheduler(bot)
     logging.basicConfig(level=logging.DEBUG)
     dp = Dispatcher()
     dp.include_router(admin_helper.router)

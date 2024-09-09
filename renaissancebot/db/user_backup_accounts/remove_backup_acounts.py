@@ -33,8 +33,7 @@ async def remove_old_backup_accounts():
                     DELETE FROM UserBackupAccounts
                     WHERE user_id = ? AND email = ?
                 ''', (user_id, email))
-        else:
-            print("No rows to delete.")
+
 
         # Применяем изменения
         await conn.commit()
