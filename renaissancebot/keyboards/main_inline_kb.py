@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def main_inline_kb() -> InlineKeyboardMarkup:
@@ -11,7 +10,7 @@ def main_inline_kb() -> InlineKeyboardMarkup:
          InlineKeyboardButton(text="❔ FAQ", callback_data="faq")],
         [InlineKeyboardButton(text="🛠️ Поддержка", url='https://t.me/RenAIssanceSupport'),
          InlineKeyboardButton(text="💻 Наш телеграм", url='https://t.me/plusgpt4')]
-        ]
+    ]
 
     kb = InlineKeyboardMarkup(inline_keyboard=kb)
 

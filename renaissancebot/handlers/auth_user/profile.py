@@ -29,17 +29,16 @@ async def profile(callback: CallbackQuery, bot: Bot):
 async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     # Получаем данные пользователя
     backup_account_inf: str = ''
-    email = await get_user_email(user_id)
     account_email = await get_user_account(user_id)
     if account_email:
         # Убираем "_ind" из названия аккаунта, если это индивидуальный аккаунт
         if account_email.endswith('_ind'):
             account_email = account_email[:-4]
-        text_account_email = f'`{account_email}` (нажмите, чтобы скопировать)'
+        text_account_email = f'<code>{account_email}</code> (нажмите, чтобы скопировать)'
     else:
         text_account_email = 'у вас нет аккаунта ChatGPT'
     date_expiration = await get_user_expiration_date(user_id)
-
+    formatted_expiration_date = 'Вы ещё не оформляли подписку'
     # Проверяем дату окончания подписки
     password = None  # Инициализируем пароль по умолчанию
     if date_expiration:
@@ -50,29 +49,38 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
             if await check_user_backup_account(user_id):
                 email_backup_account = await get_user_backup_account(user_id)
                 backup_account_password = await get_backup_account_password(email_backup_account)
-                backup_account_inf = (f"\n**Логин резервного аккаунта:** `{email_backup_account or ''}`\n\n"
-                                      f"**Пароль от резервного аккаунта:** `{backup_account_password or ''}`")
+                backup_account_inf = (
+                    f"\n\n<b>==============================</b>\n"
+                    f"<b><i>Резервный аккаунт</i></b>\n\n"
+                    f"<b><i>Логин:</i></b> <code>{email_backup_account or ''}</code>\n"
+                    f"<b><i>Пароль:</i></b> <code>{backup_account_password or ''}</code>\n"
+                    f"<b>==============================</b>")
+                # Преобразуем дату окончания подписки в формат d-m-y
+                day = expiration_date.day
+                month = expiration_date.month
+                year = expiration_date.year
+                formatted_expiration_date = f"{day}.{month}.{year}"
     else:
-        date_expiration = 'Вы ещё не оформляли подписку'
+        formatted_expiration_date = 'Вы ещё не оформляли подписку'
 
     # Формируем ответ
-    cart = f"**Ваш email:** {email}\n\n"
-    cart += f"**Логин ChatGPT:** {text_account_email}\n\n"  # Логин всегда показывается
+    cart = f"<b>Дата окончания подписки: <u>{formatted_expiration_date}</u></b>\n\n"
+
+    cart += f"🪪 <b>Логин ChatGPT:</b> {text_account_email}\n"  # Логин всегда показывается
 
     # Добавляем пароль, если он есть
     if password:
-        cart += f"**Пароль от аккаунта:** `{password}` (нажмите, чтобы скопировать)\n\n"
-    else:
-        cart += "**Пароль от аккаунта:** нет действительного пароля от аккаунта ChatGPT\n\n"
+        cart += f"<b>🔐 Пароль:</b> <code>{password}</code> (нажмите, чтобы скопировать)"
 
-    # Дата окончания подписки
-    cart += f"**Дата окончания подписки:** {date_expiration}\n"
+    else:
+        cart += f"<b>🔐 Пароль:</b> нет действительного пароля от аккаунта ChatGPT\n\n"
+
     cart += backup_account_inf
     # Отправляем сообщение
     await bot.edit_message_text(chat_id=message.chat.id,
                                 message_id=message.message_id, text=cart,
                                 reply_markup=requests_have_ended_inline_kb(),
-                                parse_mode=ParseMode.MARKDOWN)
+                                parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "req_have_ended")
