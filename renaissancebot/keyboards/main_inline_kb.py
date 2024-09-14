@@ -1,16 +1,18 @@
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def main_inline_kb() -> InlineKeyboardMarkup:
     # Создаем inline-клавиатуру
-    builder = InlineKeyboardBuilder()
-    builder.button(text="🛒 Каталог", callback_data="catalog")
-    builder.button(text="👤 Профиль", callback_data="profile")
-    builder.button(text="💌 Отзывы", url='https://t.me/RenAIssanceOpenFeedback')
-    builder.button(text="🕊 FAQ", callback_data="faq")
-    builder.button(text="❓ Тех. поддержка", url='https://t.me/RenAIssanceSupport')
-    builder.button(text="👋 Тг-канал", url='https://t.me/plusgpt4')
-    builder.adjust(2)
-    kb = builder.as_markup()
+    kb = [
+        [InlineKeyboardButton(text="🛒 Купить подписку", callback_data="catalog")],
+        [InlineKeyboardButton(text="👤 Профиль", callback_data="profile")],
+        [InlineKeyboardButton(text="💌 Отзывы", url='https://t.me/RenAIssanceOpenFeedback'),
+         InlineKeyboardButton(text="🕊 FAQ", callback_data="faq")],
+        [InlineKeyboardButton(text="❓ Тех. поддержка", url='https://t.me/RenAIssanceSupport'),
+         InlineKeyboardButton(text="👋 Тг-канал", url='https://t.me/plusgpt4')]
+        ]
+
+    kb = InlineKeyboardMarkup(inline_keyboard=kb)
+
     return kb

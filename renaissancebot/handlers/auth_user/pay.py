@@ -46,7 +46,7 @@ async def order(callback: CallbackQuery, bot: Bot):
             description = 'Подписка ChatGPT+ на 6 месяцев'
     await bot.send_invoice(
         chat_id=callback.message.chat.id,
-        title='Покупка подписки',
+        title='Покупка подписки (карта РФ)',
         description=description,
         payload=f'subscription_{month}_months',  # Уникальный идентификатор платежа с количеством месяцев
         provider_token=config.provider_token.get_secret_value(),  # Тестовый токен платежного провайдера
