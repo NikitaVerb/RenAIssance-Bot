@@ -5,3 +5,6 @@ from .main_reply_markup import get_main_kb
 from .reg_inline_markup import reg_inline_markup
 from .faq_inline_kb import faq_inline_kb
 from .back_to_faq_inline_kb import back_to_faq_inline_kb
+from .requests_have_ended_inline_kb import requests_have_ended_inline_kb
+from .backup_account_inline_kb import backup_account_inline_kb
+from .back_to_profile_inline_kb import back_to_profile_inline_kb

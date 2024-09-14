@@ -7,8 +7,7 @@ from aiogram.types import CallbackQuery
 from db import get_user_email, get_user_account, get_user_expiration_date, get_account_password, \
     get_used_backup_account_date, get_user_backup_account, get_backup_account_password, check_user_in_db, \
     check_user_backup_account
-from keyboards import reg_inline_markup, profile_inline_kb
-from keyboards.profile_inline_kb import profile_inline_kb
+from keyboards import reg_inline_markup, backup_account_inline_kb, requests_have_ended_inline_kb
 
 router = Router()
 
@@ -29,7 +28,6 @@ async def profile(callback: CallbackQuery, bot: Bot):
 # Основная функция для обработки профиля
 async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     # Получаем данные пользователя
-    backup_account_button: bool = True
     backup_account_inf: str = ''
     email = await get_user_email(user_id)
     account_email = await get_user_account(user_id)
@@ -41,8 +39,6 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     else:
         text_account_email = 'у вас нет аккаунта ChatGPT'
     date_expiration = await get_user_expiration_date(user_id)
-    if not date_expiration or datetime.strptime(date_expiration.strip(), '%Y-%m-%d').date() < datetime.now().date():
-        backup_account_button = False
 
     # Проверяем дату окончания подписки
     password = None  # Инициализируем пароль по умолчанию
@@ -51,17 +47,11 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
         if expiration_date > datetime.now().date():
             # Подписка действительна, получаем пароль
             password = await get_account_password(account_email)
-            # Получаем дату последнего запроса к резервному аккаунту
-            used_backup_account_date = await get_used_backup_account_date(user_id)
-            if used_backup_account_date:
-                used_backup_account_date = datetime.strptime(used_backup_account_date.strip(), '%Y-%m-%d %H:%M:%S')
-                if used_backup_account_date + timedelta(days=3) > datetime.now():
-                    backup_account_button = False
-                if await check_user_backup_account(user_id):
-                    email_backup_account = await get_user_backup_account(user_id)
-                    backup_account_password = await get_backup_account_password(email_backup_account)
-                    backup_account_inf = (f"\n**Логин резервного аккаунта:** `{email_backup_account or ''}`\n\n"
-                                          f"**Пароль от резервного аккаунта:** `{backup_account_password or ''}`")
+            if await check_user_backup_account(user_id):
+                email_backup_account = await get_user_backup_account(user_id)
+                backup_account_password = await get_backup_account_password(email_backup_account)
+                backup_account_inf = (f"\n**Логин резервного аккаунта:** `{email_backup_account or ''}`\n\n"
+                                      f"**Пароль от резервного аккаунта:** `{backup_account_password or ''}`")
     else:
         date_expiration = 'Вы ещё не оформляли подписку'
 
@@ -81,5 +71,35 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     # Отправляем сообщение
     await bot.edit_message_text(chat_id=message.chat.id,
                                 message_id=message.message_id, text=cart,
-                                reply_markup=profile_inline_kb(backup_account_button),
+                                reply_markup=requests_have_ended_inline_kb(),
                                 parse_mode=ParseMode.MARKDOWN)
+
+
+@router.callback_query(F.data == "req_have_ended")
+async def req_have_ended(callback: CallbackQuery, bot: Bot):
+    # Получаем дату последнего запроса к резервному аккаунту
+    backup_account_button = True
+    user_id = callback.from_user.id
+
+    date_expiration = await get_user_expiration_date(user_id)
+
+    if not date_expiration or datetime.strptime(date_expiration.strip(), '%Y-%m-%d').date() < datetime.now().date():
+        backup_account_button = False
+
+    used_backup_account_date = await get_used_backup_account_date(user_id)
+
+    if used_backup_account_date:
+        used_backup_account_date = datetime.strptime(used_backup_account_date.strip(), '%Y-%m-%d %H:%M:%S')
+        if used_backup_account_date + timedelta(days=3) > datetime.now():
+            backup_account_button = False
+
+    if backup_account_button:
+        text = ("Если у Вас исчерпан лимит запросов, то вы можете получить временный резервный аккаунт, "
+                "данные от него будут отображаться у вас в профиле в течении одного дня.\n"
+                "После нажатия кнопка будет отсутствовать следующие 3 дня")
+    else:
+        text = ("Вы уже запрашивали резервный аккаунт,"
+                " кнопка появится по истечении  3-х дней после её последнего нажатия")
+
+    await bot.edit_message_text(chat_id=callback.from_user.id, message_id=callback.message.message_id,
+                                text=text, reply_markup=backup_account_inline_kb(backup_account_button))
