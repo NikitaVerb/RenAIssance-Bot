@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from aiogram import Router, types
+from aiogram import Router, types, Bot
 from aiogram.filters import Command, CommandObject
 
 import filters.user_rights
@@ -9,13 +9,14 @@ from db import check_account_in_db, check_user_email_in_db, get_user_id, \
     add_link_user_to_account, set_expiration_date, set_purchase_date, \
     get_user_expiration_date, unlink_user_from_account
 from db.users.set_notified import set_notified
+from keyboards import profile_button_inline_kb
 
 router = Router()
 router.message.filter(filters.user_rights.UserIsAdmin())
 
 
 @router.message(Command('link'))
-async def link_user_to_account_handler(message: types.Message, command: CommandObject):
+async def link_user_to_account_handler(message: types.Message, command: CommandObject, bot: Bot):
     try:
         # Проверяем, что переданы аргументы
         if not command.args:
@@ -85,6 +86,10 @@ async def link_user_to_account_handler(message: types.Message, command: CommandO
         # Уведомляем о успешной привязке
         await message.answer(
             f"Пользователь {user_email} успешно привязан к аккаунту {account_email} до {expiration_date}.")
+        # уведомляем владельца индивидуального аккаунта, что он теперь привязан к аккаунту
+        await bot.send_message(chat_id=user_id, text="Ваш индивидуальный аккаунт готов! Информацию"
+                                                     " об аккаунте вы можете посмотреть в профиле.",
+                               reply_markup=profile_button_inline_kb())
         # Устанавливаем значение notified в 0, что означает, что пользователь не оповещен о продлении подписки
         await set_notified(user_id, 0)
 

@@ -7,9 +7,11 @@ from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 
 import filters.user_rights
 from config_reader import config
-from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account
+from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account, \
+    get_user_email
 from db import set_expiration_date, set_purchase_date, add_to_users_spent, check_user_in_db
 from db.users.set_notified import set_notified
+from handlers.admin.send_message_to_all_admins import send_message_to_all_admins
 from keyboards import reg_from_catalog_inline_markup, back_to_catalog_inline_kb, \
     profile_button_inline_kb
 
@@ -21,7 +23,8 @@ router.message.filter(filters.user_rights.UserIsLogged())
 @router.callback_query(F.data.startswith('subscribe_'))
 async def order(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await callback.answer()
-    months = int(callback.data.split('_')[1])
+
+    months = (callback.data.split('_')[1])
 
     if not (await check_user_in_db(callback.from_user.id)):
         await bot.edit_message_text(chat_id=callback.message.chat.id,
@@ -41,18 +44,21 @@ async def order(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await send_invoice(message=callback.message, bot=bot, months=months)
 
 
-async def send_invoice(message: Message, bot: Bot, months: int):
+async def send_invoice(message: Message, bot: Bot, months: str):
     # Определяем цену и описание в зависимости от количества месяцев
     match months:
-        case 1:
+        case "1":
             price = 10000
             description = 'Подписка ChatGPT+ на 1 месяц'
-        case 3:
+        case "3":
             price = 15000
             description = 'Подписка ChatGPT+ на 3 месяца'
-        case 6:
+        case "6":
             price = 25000
             description = 'Подписка ChatGPT+ на 6 месяцев'
+        case "ind":
+            price = 30000
+            description = 'Индивидуальная подписка ChatGPT+ на 1 месяц'
         case _:
             price = 0
             description = ''
@@ -61,7 +67,7 @@ async def send_invoice(message: Message, bot: Bot, months: int):
         chat_id=message.chat.id,
         title='Покупка подписки (карта РФ)',
         description=description,
-        payload=f'subscription_{months}_months',  # Информация о подписке
+        payload=f'subscription_{months}',  # Информация о подписке
         provider_token=config.provider_token.get_secret_value(),
         currency='RUB',
         prices=[LabeledPrice(label='Доступ к подписке', amount=price)],
@@ -94,8 +100,23 @@ def add_months(source_date, months):
 
 
 @router.message(F.successful_payment)
-async def success_payment(message: Message):
+async def success_payment(message: Message, bot: Bot):
     amount = message.successful_payment.total_amount // 100  # Сумма в рублях
+    # Извлечение количества месяцев из payload
+    payload = message.successful_payment.invoice_payload
+    months = payload.split('_')[1]
+    if months == "ind":
+        await message.answer(f"Успешная оплата. Спасибо за покупку!\n\n"
+                             f"Мы уже оформляем подписку. Аккаунт в скором времени отобразится в Вашем профиле."
+                             f" Мы оповестим Вас, когда это произойдёт.\n\n"
+                             f"Подписывайтесь на <a href='https://t.me/plusgpt4'>телеграм-канал</a>,"
+                             f" чтобы оставаться в курсе событий.", reply_markup=profile_button_inline_kb())
+        await send_message_to_all_admins(bot=bot, message_text=f"Юзер {await get_user_email(message.from_user.id)}"
+                                                               " оплатил подписку"
+                                         f" на индивидуальный аккаунт на месяц")
+        await add_to_users_spent(message.from_user.id, amount)
+        return
+
     msg = (f'Успешная оплата. Спасибо за покупку!\n'
            f'Откройте профиль, чтобы получить аккаунт.\n\n'
            f'Подписывайтесь на <a href="https://t.me/plusgpt4">телеграм-канал</a>, чтобы оставаться в курсе событий.')
