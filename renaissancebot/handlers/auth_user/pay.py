@@ -14,6 +14,7 @@ from db.users.set_notified import set_notified
 from handlers.admin.send_message_to_all_admins import send_message_to_all_admins
 from keyboards import reg_from_catalog_inline_markup, back_to_catalog_inline_kb, \
     profile_button_inline_kb
+from keyboards.payment_method_inline_kb import payment_method_inline_kb
 
 router = Router()
 router.message.filter(filters.user_rights.UserIsLogged())
@@ -25,6 +26,8 @@ async def order(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await callback.answer()
 
     months = (callback.data.split('_')[1])
+    # Сохраняем информацию о месячном плане в состоянии
+    await state.update_data(subscription_months=months)
 
     if not (await check_user_in_db(callback.from_user.id)):
         await bot.edit_message_text(chat_id=callback.message.chat.id,
@@ -32,8 +35,7 @@ async def order(callback: CallbackQuery, bot: Bot, state: FSMContext):
                                     f'Если хотите приобрести подписку или отслеживать статус уже купленной подписки,'
                                     f' то вам нужно зарегистрироваться.',
                                     reply_markup=reg_from_catalog_inline_markup(pay=True))
-        # Сохраняем информацию о месячном плане в состоянии
-        await state.update_data(subscription_months=months)
+
         return
 
     if not (await get_most_linked_email_account()):
@@ -41,7 +43,16 @@ async def order(callback: CallbackQuery, bot: Bot, state: FSMContext):
                                     text="Извините, к сожалению, у нас сейчас нет свободных аккаунтов",
                                     reply_markup=back_to_catalog_inline_kb())
         return
-    await send_invoice(message=callback.message, bot=bot, months=months)
+    await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id,
+                                text="Выберите удобный Вам способ оплаты", reply_markup=payment_method_inline_kb())
+
+
+@router.callback_query(F.data == "invoice")
+async def invoice_handler(callback: CallbackQuery, bot: Bot, state: FSMContext):
+    await callback.answer()
+    data = await state.get_data()
+    months = data.get("subscription_months")
+    await send_invoice(callback.message, bot, months)
 
 
 async def send_invoice(message: Message, bot: Bot, months: str):
@@ -113,7 +124,7 @@ async def success_payment(message: Message, bot: Bot):
                              f" чтобы оставаться в курсе событий.", reply_markup=profile_button_inline_kb())
         await send_message_to_all_admins(bot=bot, message_text=f"Юзер {await get_user_email(message.from_user.id)}"
                                                                " оплатил подписку"
-                                         f" на индивидуальный аккаунт на месяц")
+                                                               f" на индивидуальный аккаунт на месяц")
         await add_to_users_spent(message.from_user.id, amount)
         return
 
