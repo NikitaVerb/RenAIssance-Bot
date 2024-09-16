@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from aiogram import Bot, Router, F
 from aiogram.enums import ParseMode
+from aiogram.fsm.context import FSMContext
 from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 
 import filters.user_rights
@@ -18,25 +19,31 @@ router.message.filter(filters.user_rights.UserIsLogged())
 
 # Обработчик команды для оформления заказа
 @router.callback_query(F.data.startswith('subscribe_'))
-async def order(callback: CallbackQuery, bot: Bot):
+async def order(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await callback.answer()
+    months = int(callback.data.split('_')[1])
+
     if not (await check_user_in_db(callback.from_user.id)):
         await bot.edit_message_text(chat_id=callback.message.chat.id,
                                     message_id=callback.message.message_id, text=
                                     f'Если хотите приобрести подписку или отслеживать статус уже купленной подписки,'
-                                    f' то вам нужно зарегистрироваться',
-                                    reply_markup=reg_from_catalog_inline_markup())
+                                    f' то вам нужно зарегистрироваться.',
+                                    reply_markup=reg_from_catalog_inline_markup(pay=True))
+        # Сохраняем информацию о месячном плане в состоянии
+        await state.update_data(subscription_months=months)
         return
 
-    month = int(callback.data.split('_')[1])
-    price = 0
-    description = ''
     if not (await get_most_linked_email_account()):
         await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id,
                                     text="Извините, к сожалению, у нас сейчас нет свободных аккаунтов",
                                     reply_markup=back_to_catalog_inline_kb())
         return
-    match month:
+    await send_invoice(message=callback.message, bot=bot, months=months)
+
+
+async def send_invoice(message: Message, bot: Bot, months: int):
+    # Определяем цену и описание в зависимости от количества месяцев
+    match months:
         case 1:
             price = 10000
             description = 'Подписка ChatGPT+ на 1 месяц'
@@ -46,19 +53,18 @@ async def order(callback: CallbackQuery, bot: Bot):
         case 6:
             price = 25000
             description = 'Подписка ChatGPT+ на 6 месяцев'
+        case _:
+            price = 0
+            description = ''
+    # Отправляем инвойс
     await bot.send_invoice(
-        chat_id=callback.message.chat.id,
+        chat_id=message.chat.id,
         title='Покупка подписки (карта РФ)',
         description=description,
-        payload=f'subscription_{month}_months',  # Уникальный идентификатор платежа с количеством месяцев
-        provider_token=config.provider_token.get_secret_value(),  # Тестовый токен платежного провайдера
+        payload=f'subscription_{months}_months',  # Информация о подписке
+        provider_token=config.provider_token.get_secret_value(),
         currency='RUB',
-        prices=[
-            LabeledPrice(
-                label='Доступ к подписке',
-                amount=price,  # Цена в копейках (10000 копеек = 100 рублей)
-            )
-        ],
+        prices=[LabeledPrice(label='Доступ к подписке', amount=price)],
         start_parameter='subscription_start',
         provider_data=None,
         photo_url=None,
