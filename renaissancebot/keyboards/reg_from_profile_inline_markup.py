@@ -2,10 +2,11 @@ from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def back_to_profile_inline_kb() -> InlineKeyboardMarkup:
+def reg_from_profile_inline_markup() -> InlineKeyboardMarkup:
     # Создаем inline-клавиатуру с одной кнопкой
     builder = InlineKeyboardBuilder()
-    builder.button(text="↩ Назад в профиль", callback_data="profile")
+    builder.button(text="Зарегистрироваться", callback_data="start_registration")
+    builder.button(text="↩ Назад в меню", callback_data="menu")
     builder.adjust(1)
     kb = builder.as_markup()
     return kb

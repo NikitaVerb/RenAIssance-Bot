@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from aiogram import Bot, Router, F
+from aiogram.enums import ParseMode
 from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 
 import filters.user_rights
@@ -8,7 +9,8 @@ from config_reader import config
 from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account
 from db import set_expiration_date, set_purchase_date, add_to_users_spent, check_user_in_db
 from db.users.set_notified import set_notified
-from keyboards import reg_inline_markup, back_to_menu_inline_kb
+from keyboards import reg_from_catalog_inline_markup, back_to_catalog_inline_kb, \
+    profile_button_inline_kb
 
 router = Router()
 router.message.filter(filters.user_rights.UserIsLogged())
@@ -23,7 +25,7 @@ async def order(callback: CallbackQuery, bot: Bot):
                                     message_id=callback.message.message_id, text=
                                     f'Если хотите приобрести подписку или отслеживать статус уже купленной подписки,'
                                     f' то вам нужно зарегистрироваться',
-                                    reply_markup=reg_inline_markup())
+                                    reply_markup=reg_from_catalog_inline_markup())
         return
 
     month = int(callback.data.split('_')[1])
@@ -32,7 +34,7 @@ async def order(callback: CallbackQuery, bot: Bot):
     if not (await get_most_linked_email_account()):
         await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id,
                                     text="Извините, к сожалению, у нас сейчас нет свободных аккаунтов",
-                                    reply_markup=back_to_menu_inline_kb())
+                                    reply_markup=back_to_catalog_inline_kb())
         return
     match month:
         case 1:
@@ -90,7 +92,7 @@ async def success_payment(message: Message):
     amount = message.successful_payment.total_amount // 100  # Сумма в рублях
     msg = (f'Успешная оплата. Спасибо за покупку!\n'
            f'Откройте профиль, чтобы получить аккаунт.\n\n'
-           f'Подписывайтесь на телеграм-канал, чтобы оставаться в курсе событий.')
+           f'Подписывайтесь на <a href="https://t.me/plusgpt4">телеграм-канал</a>, чтобы оставаться в курсе событий.')
 
     # Извлечение количества месяцев из payload
     months = int(message.successful_payment.invoice_payload.split('_')[1])
@@ -123,4 +125,4 @@ async def success_payment(message: Message):
     await add_to_users_spent(message.from_user.id, amount)
     # Устанавливаем значение notified в 0, что означает, что пользователь не оповещен о продлении подписки
     await set_notified(message.from_user.id, 0)
-    await message.answer(msg, reply_markup=back_to_menu_inline_kb())
+    await message.answer(msg, reply_markup=profile_button_inline_kb(), parse_mode=ParseMode.HTML)
