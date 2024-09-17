@@ -8,7 +8,7 @@ from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 import filters.user_rights
 from config_reader import config
 from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account, \
-    get_user_email
+    get_user_email, unlink_user_from_account
 from db import set_expiration_date, set_purchase_date, add_to_users_spent, check_user_in_db
 from db.users.set_notified import set_notified
 from handlers.admin.send_message_to_all_admins import send_message_to_all_admins
@@ -148,8 +148,9 @@ async def success_payment(message: Message, bot: Bot):
 
     # Проверка наличия аккаунта и связывание с пользователем при необходимости
     account_email = await get_user_account(message.from_user.id)
-    if not account_email:
+    if not account_email or account_email.endswith("_ind"):
         account_email = await get_most_linked_email_account()
+        await unlink_user_from_account(message.from_user.id)
         await add_link_user_to_account(message.from_user.id, account_email)
 
     # Установка новой даты окончания подписки

@@ -10,7 +10,7 @@ from db import create_db
 from filters.setup_scheduler import setup_scheduler
 from handlers.admin import add_account, unlink_from_account, link_user_to_account, get_accounts, \
     get_data, admin_helper, update_password, delete_account, add_admin, add_spent
-from handlers.auth_user import update_email, profile, pay, backup_account
+from handlers.auth_user import update_email, profile, pay, backup_account, crypto_payment
 from handlers.user import user_start, registration, utils, catalog, menu, faq
 
 
@@ -39,6 +39,7 @@ async def main():
     dp.include_router(add_admin.router)
     dp.include_router(backup_account.router)
     dp.include_router(add_spent.router)
+    dp.include_router(crypto_payment.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, skip_updates=False)
