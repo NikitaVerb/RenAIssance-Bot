@@ -11,6 +11,7 @@ from aiogram.types import ContentType
 from db import set_expiration_date, set_purchase_date, get_user_expiration_date, \
     add_link_user_to_account, get_user_account, get_most_linked_email_account, get_all_admin_ids, add_to_users_spent, \
     set_notified, get_user_email, unlink_user_from_account
+from filters.user_data_callback_factory import UserDataCallbackFactory
 from handlers.admin.send_message_to_all_admins import send_message_to_all_admins
 from handlers.auth_user.pay import add_months
 from keyboards import profile_button_inline_kb, admin_approval_inline_kb, back_to_catalog_inline_kb
@@ -42,6 +43,7 @@ async def handle_crypto_callback(callback: CallbackQuery, state: FSMContext, bot
         case _:
             price = 0
     # Изменяем сообщение на другое (текст потом можно подставить)
+
     await bot.edit_message_text(chat_id=callback.message.chat.id,
                                 message_id=callback.message.message_id,
                                 text=f"Переведите ${price} по адресу, указанному ниже,"
@@ -68,6 +70,7 @@ async def process_photo_or_link(message: types.Message, state: FSMContext, bot: 
     user_email = await get_user_email(message.from_user.id)
     data = await state.get_data()
     sub_type = data.get("subscription_months")
+    amount = int(data.get("amount", 0))
     if sub_type == "inf":
         admin_message = (
             f"Пользователь {user_email} отправил подтверждение на оплату индивидуального аккаунта на месяц."
@@ -82,43 +85,58 @@ async def process_photo_or_link(message: types.Message, state: FSMContext, bot: 
         # Отправляем сообщение админу с кнопками
         for admin_id in await get_all_admin_ids():
             await bot.send_photo(admin_id, photo=user_data['photo'], caption=admin_message,
-                                 reply_markup=admin_approval_inline_kb())
+                                 reply_markup=admin_approval_inline_kb(user_id=message.from_user.id,
+                                                                       sub_type=sub_type,
+                                                                       amount=amount))
     elif message.text:
         # Если пришла ссылка
         user_data['link'] = message.text
         admin_message += message.text
         for admin_id in await get_all_admin_ids():
-            await bot.send_message(admin_id, text=admin_message, reply_markup=admin_approval_inline_kb())
+            await bot.send_message(admin_id, text=admin_message,
+                                   reply_markup=admin_approval_inline_kb(user_id=message.from_user.id,
+                                                                         sub_type=sub_type,
+                                                                         amount=amount))
 
     # Сохраняем фото или ссылку в состояние
     await state.update_data(**user_data)
 
     await state.update_data(user_id=message.from_user.id)
+    await message.answer("Ваша транзакция была отправлена администратору на проверку."
+                         " После подтверждения Вы получите уведомление.")
     # Переходим в состояние ожидания решения от админа
     await state.set_state(PurchaseFSM.waiting_for_admin_decision)
 
 
 # Обработка решения админа: одобрить
-@router.callback_query(F.data == "approve")
-async def admin_approve(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
+@router.callback_query(UserDataCallbackFactory.filter())
+async def admin_approve(callback: types.CallbackQuery, callback_data: UserDataCallbackFactory, bot: Bot):
     await callback.answer()
     # Удаление клавиатуры у сообщения
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    # Извлечение данных из состояния FSM
-    user_data = await state.get_data()
-    user_id = user_data.get("user_id")
-    months = user_data.get("subscription_months")
-    amount = user_data.get("amount", 0)
+    # Извлечение данных
+    user_id = callback_data.user_id
+    months = callback_data.subscription_type
+    amount = callback_data.amount
+
+    if callback_data.action == "problem":
+        await callback.answer()
+        # Удаляем клавиатуру
+        await callback.message.edit_reply_markup(reply_markup=None)
+        # Отправляем пользователю сообщение о проблеме с кнопкой для связи с поддержкой
+        await bot.send_message(user_id, "Произошла проблема с вашим платежом. Пожалуйста, свяжитесь с поддержкой.",
+                               reply_markup=support_inline_kb())
+        return
 
     user_email = await get_user_email(user_id)
     if months == "ind":
-        await callback.message.answer(f"Успешная оплата. Спасибо за покупку!\n\n"
-                                      f"Мы уже оформляем подписку. Аккаунт в скором времени отобразится в Вашем профиле."
-                                      f" Мы оповестим Вас, когда это произойдёт.\n\n"
-                                      f"Подписывайтесь на <a href='https://t.me/plusgpt4'>телеграм-канал</a>,"
-                                      f" чтобы оставаться в курсе событий.",
-                                      reply_markup=profile_button_inline_kb())
+        await bot.send_message(user_id, "Успешная оплата. Спасибо за покупку!\n\n"
+                                        f"Мы уже оформляем подписку. Аккаунт в скором времени отобразится в Вашем профиле."
+                                        f" Мы оповестим Вас, когда это произойдёт.\n\n"
+                                        f"Подписывайтесь на <a href='https://t.me/plusgpt4'>телеграм-канал</a>,"
+                                        f" чтобы оставаться в курсе событий.",
+                               reply_markup=profile_button_inline_kb())
         await send_message_to_all_admins(bot=bot,
                                          message_text=f"Юзер {user_email} оплатил подписку на индивидуальный аккаунт на месяц.")
         await add_to_users_spent(callback.message.from_user.id, amount)
@@ -168,24 +186,3 @@ async def admin_approve(callback: types.CallbackQuery, state: FSMContext, bot: B
 
     # Отправляем сообщение пользователю
     await bot.send_message(user_id, msg, reply_markup=profile_button_inline_kb(), parse_mode=ParseMode.HTML)
-
-    # Очищаем состояние
-    await state.clear()
-
-
-# Обработка решения админа: проблема
-@router.callback_query(F.data == "problem")
-async def problem_with_payment(callback: CallbackQuery, state: FSMContext, bot: Bot):
-    await callback.answer()
-    # Удаляем клавиатуру
-    await callback.message.edit_reply_markup(reply_markup=None)
-
-    user_data = await state.get_data()
-    user_id = user_data.get("user_id")  # Получаем id пользователя
-
-    # Отправляем пользователю сообщение о проблеме с кнопкой для связи с поддержкой
-    await bot.send_message(int(user_id), "Произошла проблема с вашим платежом. Пожалуйста, свяжитесь с поддержкой.",
-                           reply_markup=support_inline_kb())
-
-    # Завершаем состояние
-    await state.clear()

@@ -6,12 +6,12 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from email_validator import validate_email, EmailNotValidError
-from ..auth_user.pay import send_invoice
 
 import filters.user_rights
 from db import add_user
 from db import check_user_email_in_db
 from keyboards import back_to_menu_inline_kb
+from keyboards.payment_method_inline_kb import payment_method_inline_kb
 
 router = Router()
 router.message.filter(filters.user_rights.UserIsNotLogged())
@@ -72,17 +72,17 @@ async def process_user_email(message: types.Message, state: FSMContext, bot: Bot
 
             if registration_type == "pay":
                 # Ваша специальная клавиатура для регистрации с оплатой
-                await message.answer("Вы успешно зарегистрированы! Пожалуйста, завершите оплату.",
-                                     parse_mode=ParseMode.MARKDOWN)
-                user_data = await state.get_data()
-                await send_invoice(message, bot, user_data.get("subscription_months"))
+                await message.answer("Вы успешно зарегистрированы! Выберите удобный Вам способ оплаты",
+                                     parse_mode=ParseMode.MARKDOWN, reply_markup=payment_method_inline_kb())
+
+
             else:
                 # Обычная клавиатура для стандартной регистрации
                 await message.answer("Вы успешно зарегистрированы!\n"
                                      "Теперь вы можете совершать покупки и следить за статусом подписок в профиле",
                                      parse_mode=ParseMode.MARKDOWN, reply_markup=back_to_menu_inline_kb())
+                await state.clear()
 
-            await state.clear()
 
     except EmailNotValidError as e:
         # Если email невалидный, сообщаем об ошибке

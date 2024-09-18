@@ -36,9 +36,10 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     account_email = await get_user_account(user_id)
     date_expiration = await get_user_expiration_date(user_id)
     backup_account_inf = ''
-    account_is_ind = True if account_email.endswith('_ind') else False
+
+    account_is_ind = (account_email and account_email.endswith('_ind'))
     # Проверяем срок действия подписки
-    if date_expiration:
+    if date_expiration and account_email:
         expiration_date = datetime.strptime(date_expiration.strip(), '%Y-%m-%d').date()
         # Подписка действительна
         if expiration_date > datetime.now().date():
