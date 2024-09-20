@@ -86,10 +86,12 @@ async def link_user_to_account_handler(message: types.Message, command: CommandO
         # Уведомляем о успешной привязке
         await message.answer(
             f"Пользователь {user_email} успешно привязан к аккаунту {account_email} до {expiration_date}.")
-        # уведомляем владельца индивидуального аккаунта, что он теперь привязан к аккаунту
-        await bot.send_message(chat_id=user_id, text="Ваш индивидуальный аккаунт готов! Информацию"
-                                                     " об аккаунте вы можете посмотреть в профиле.",
-                               reply_markup=profile_button_inline_kb())
+
+        if user_email.endswith('_ind'):
+            # уведомляем владельца индивидуального аккаунта, что он теперь привязан к аккаунту
+            await bot.send_message(chat_id=user_id, text="Ваш индивидуальный аккаунт готов! Информацию"
+                                                         " об аккаунте вы можете посмотреть в профиле.",
+                                   reply_markup=profile_button_inline_kb())
         # Устанавливаем значение notified в 0, что означает, что пользователь не оповещен о продлении подписки
         await set_notified(user_id, 0)
 
