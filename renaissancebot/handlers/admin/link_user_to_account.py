@@ -7,7 +7,7 @@ from aiogram.filters import Command, CommandObject
 import filters.user_rights
 from db import check_account_in_db, check_user_email_in_db, get_user_id, \
     add_link_user_to_account, set_expiration_date, set_purchase_date, \
-    get_user_expiration_date, unlink_user_from_account
+    get_user_expiration_date, unlink_user_from_account, reset_used_backup_account, remove_backup_account
 from db.users.set_notified import set_notified
 from keyboards import profile_button_inline_kb
 
@@ -87,13 +87,16 @@ async def link_user_to_account_handler(message: types.Message, command: CommandO
         await message.answer(
             f"Пользователь {user_email} успешно привязан к аккаунту {account_email} до {expiration_date}.")
 
-        if user_email.endswith('_ind'):
+        if account_email.endswith('_ind'):
             # уведомляем владельца индивидуального аккаунта, что он теперь привязан к аккаунту
             await bot.send_message(chat_id=user_id, text="Ваш индивидуальный аккаунт готов! Информацию"
                                                          " об аккаунте вы можете посмотреть в профиле.",
                                    reply_markup=profile_button_inline_kb())
         # Устанавливаем значение notified в 0, что означает, что пользователь не оповещен о продлении подписки
         await set_notified(user_id, 0)
+        # сброс времени последней активации резервного аккаунта
+        await reset_used_backup_account(user_id)
+        await remove_backup_account(user_id)
 
     except Exception as e:
         # Логируем и отправляем уведомление об ошибке

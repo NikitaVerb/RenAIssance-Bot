@@ -12,3 +12,4 @@ from .reg_from_profile_inline_markup import reg_from_profile_inline_markup
 from .profile_button_inline_kb import profile_button_inline_kb
 from .admin_approval_inline_kb import admin_approval_inline_kb
 from .support_inline_kb import support_inline_kb
+from .menu_and_catalog_inline_kb import menu_and_catalog_inline_kb

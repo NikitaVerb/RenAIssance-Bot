@@ -10,7 +10,7 @@ from aiogram.types import ContentType
 
 from db import set_expiration_date, set_purchase_date, get_user_expiration_date, \
     add_link_user_to_account, get_user_account, get_most_linked_email_account, get_all_admin_ids, add_to_users_spent, \
-    set_notified, get_user_email, unlink_user_from_account
+    set_notified, get_user_email, unlink_user_from_account, reset_used_backup_account, remove_backup_account
 from filters.user_data_callback_factory import UserDataCallbackFactory
 from handlers.admin.send_message_to_all_admins import send_message_to_all_admins
 from handlers.auth_user.pay import add_months
@@ -71,7 +71,7 @@ async def process_photo_or_link(message: types.Message, state: FSMContext, bot: 
     data = await state.get_data()
     sub_type = data.get("subscription_months")
     amount = int(data.get("amount", 0))
-    if sub_type == "inf":
+    if sub_type == "ind":
         admin_message = (
             f"Пользователь {user_email} отправил подтверждение на оплату индивидуального аккаунта на месяц."
             f" Проверьте и примите решение:")
@@ -183,6 +183,10 @@ async def admin_approve(callback: types.CallbackQuery, callback_data: UserDataCa
 
     # Устанавливаем значение notified в 0 (чтобы пользователь получил уведомление о продлении)
     await set_notified(user_id, 0)
+
+    # сброс времени последней активации резервного аккаунта
+    await reset_used_backup_account(user_id)
+    await remove_backup_account(user_id)
 
     # Отправляем сообщение пользователю
     await bot.send_message(user_id, msg, reply_markup=profile_button_inline_kb(), parse_mode=ParseMode.HTML)

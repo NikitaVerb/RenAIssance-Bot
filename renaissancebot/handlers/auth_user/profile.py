@@ -8,7 +8,7 @@ from db import get_user_account, get_user_expiration_date, get_account_password,
     get_used_backup_account_date, get_user_backup_account, get_backup_account_password, check_user_in_db, \
     check_user_backup_account
 from keyboards import backup_account_inline_kb, requests_have_ended_inline_kb, \
-    reg_from_profile_inline_markup, back_to_menu_inline_kb
+    reg_from_profile_inline_markup, back_to_menu_inline_kb, menu_and_catalog_inline_kb
 
 router = Router()
 
@@ -22,40 +22,45 @@ async def profile(callback: CallbackQuery, bot: Bot):
     if not await check_user_in_db(user_id):
         await bot.edit_message_text(chat_id=callback.message.chat.id,
                                     message_id=callback.message.message_id,
-                                    text='Для покупки подписки или отслеживания её статуса необходимо зарегистрироваться.',
+                                    text='Для покупки подписки и отслеживания её статуса необходимо зарегистрироваться.',
                                     reply_markup=reg_from_profile_inline_markup())
         return
 
-    # Обрабатываем профиль пользователя
+
+    # Проверка активна ли подписка у пользователя
+    msg = bot.edit_message_text(chat_id=callback.message.chat.id,
+                                message_id=callback.message.message_id,
+                                text='На данный момент у вас нет активной подписки.'
+                                     ' Статус подписки можно посмотреть только, если она действительна.',
+                                reply_markup=menu_and_catalog_inline_kb())
+
+    expiration_date = await get_user_expiration_date(user_id)
+    if not expiration_date:
+        await msg
+        return
+    elif datetime.strptime(expiration_date, '%Y-%m-%d').date() < datetime.now().date():
+        await msg
+        return
+
     await profile_handler(callback.message, user_id, bot)
 
 
-# Основная функция для отображения профиля
 async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     # Получаем основные данные пользователя
     account_email = await get_user_account(user_id)
-    date_expiration = await get_user_expiration_date(user_id)
+    expiration_date = datetime.strptime(await get_user_expiration_date(user_id), '%Y-%m-%d').date()
     backup_account_inf = ''
 
     account_is_ind = (account_email and account_email.endswith('_ind'))
     # Проверяем срок действия подписки
-    if date_expiration and account_email:
-        expiration_date = datetime.strptime(date_expiration.strip(), '%Y-%m-%d').date()
-        # Подписка действительна
-        if expiration_date > datetime.now().date():
-            password = await get_account_password(account_email)
-            # Обрабатываем индивидуальный аккаунт (удаляем суффикс "_ind")
-            account_email_display = f"<code>{account_email[:-4]}</code>" if account_email.endswith(
-                '_ind') else f"<code>{account_email}</code>"
-        else:
-            password = None
-            account_email_display = 'У вас нет активного аккаунта ChatGPT'
-        # Форматируем дату окончания подписки
-        formatted_expiration_date = expiration_date.strftime('%d.%m.%Y')
-    else:
-        password = None
-        account_email_display = 'У вас нет активного аккаунта ChatGPT'
-        formatted_expiration_date = 'Подписка не активна'
+
+    password = await get_account_password(account_email)
+    # Обрабатываем индивидуальный аккаунт (удаляем суффикс "_ind")
+    account_email_display = f"<code>{account_email[:-4]}</code>" if account_email.endswith(
+        '_ind') else f"<code>{account_email}</code>"
+
+    # Форматируем дату окончания подписки
+    formatted_expiration_date = expiration_date.strftime('%d.%m.%Y')
 
     # Проверка наличия резервного аккаунта
     if await check_user_backup_account(user_id):
@@ -72,7 +77,7 @@ async def profile_handler(message: types.Message, user_id: int, bot: Bot):
     # Собираем текст сообщения профиля
     profile_text = (
         f"<b>Дата окончания подписки:</b> <u>{formatted_expiration_date}</u>\n\n"
-        f"🪪 <b>Логин ChatGPT:</b> {account_email_display}\n"
+        f"🪪 <b>Логин ChatGPT:</b> {account_email_display} \n"
         f"<b>🔐 Пароль:</b> {f'<code>{password}</code>' if password else 'нет действующего пароля'}"
         f"{backup_account_inf}"
     )

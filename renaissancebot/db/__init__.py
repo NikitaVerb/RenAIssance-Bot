@@ -34,7 +34,7 @@ from .backup_accounts.get_backup_account_password import get_backup_account_pass
 from .user_backup_accounts.unlink_user_from_backup_account import unlink_user_from_backup_account
 from .user_backup_accounts.add_user_backup_account import add_user_backup_account
 from .users.set_used_backup_account_date import set_backup_account_date
-from .user_backup_accounts.remove_backup_acounts import remove_old_backup_accounts
+from .user_backup_accounts.remove_old_backup_accounts import remove_old_backup_accounts
 from .user_backup_accounts.set_link_date import set_link_date
 from .user_backup_accounts.check_user_backup_account import check_user_backup_account
 from .backup_accounts.add_backup_accounts_or_update_password import add_backup_account_or_update_password
@@ -47,3 +47,5 @@ from .users.set_notified import set_notified
 from .users.notify_expired_users import notify_expired_users
 from .backup_database import backup_database
 from .admins.get_all_admin_ids import get_all_admin_ids
+from .users.reset_used_backup_account import reset_used_backup_account
+from .user_backup_accounts.remove_backup_account import remove_backup_account

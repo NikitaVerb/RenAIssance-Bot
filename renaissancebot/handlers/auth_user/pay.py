@@ -8,7 +8,7 @@ from aiogram.types import LabeledPrice, PreCheckoutQuery, Message, CallbackQuery
 import filters.user_rights
 from config_reader import config
 from db import get_user_expiration_date, get_most_linked_email_account, add_link_user_to_account, get_user_account, \
-    get_user_email, unlink_user_from_account
+    get_user_email, unlink_user_from_account, reset_used_backup_account, remove_backup_account
 from db import set_expiration_date, set_purchase_date, add_to_users_spent, check_user_in_db
 from db.users.set_notified import set_notified
 from handlers.admin.send_message_to_all_admins import send_message_to_all_admins
@@ -113,6 +113,7 @@ def add_months(source_date, months):
 @router.message(F.successful_payment)
 async def success_payment(message: Message, bot: Bot):
     amount = message.successful_payment.total_amount // 100  # Сумма в рублях
+    user_id = message.from_user.id
     # Извлечение количества месяцев из payload
     payload = message.successful_payment.invoice_payload
     months = payload.split('_')[1]
@@ -162,6 +163,10 @@ async def success_payment(message: Message, bot: Bot):
 
     # Обновление потраченной суммы (spent)
     await add_to_users_spent(message.from_user.id, amount)
+
+    #сброс времени последней активации резервного аккаунта
+    await reset_used_backup_account(user_id)
+    await remove_backup_account(user_id)
     # Устанавливаем значение notified в 0, что означает, что пользователь не оповещен о продлении подписки
     await set_notified(message.from_user.id, 0)
     await message.answer(msg, reply_markup=profile_button_inline_kb(), parse_mode=ParseMode.HTML)
