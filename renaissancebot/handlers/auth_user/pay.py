@@ -59,16 +59,16 @@ async def send_invoice(message: Message, bot: Bot, months: str):
     # Определяем цену и описание в зависимости от количества месяцев
     match months:
         case "1":
-            price = 10000
+            price = 64900
             description = 'Подписка ChatGPT+ на 1 месяц'
         case "3":
-            price = 15000
+            price = 174900
             description = 'Подписка ChatGPT+ на 3 месяца'
         case "6":
-            price = 25000
+            price = 334900
             description = 'Подписка ChatGPT+ на 6 месяцев'
         case "ind":
-            price = 30000
+            price = 250000
             description = 'Индивидуальная подписка ChatGPT+ на 1 месяц'
         case _:
             price = 0
