@@ -27,33 +27,65 @@ async def get_data(message: types.Message):
 
     # Заголовки столбцов таблицы Backup Accounts
     headers3 = ["Email", "Пароль", "Привязаныые пользователи"]
-    for col_num, header in enumerate(headers3):
-        sheet3.write(0, col_num, header)
+
+    col_num = 0
+    for header in headers3:
+        if header in ('Email', 'Пароль'):
+            sheet3.merge(0, 0, col_num, col_num + 3)
+            sheet3.write(0, col_num, header)
+            col_num += 4
+        else:
+            sheet3.write(0, col_num, header)  # Пишем заголовок
+            col_num += 1  # Увеличиваем индекс
 
     # Заполняем строки таблицы BackupAccounts
     all_backup_accounts = await get_backup_accounts_with_user_count()
     for row_num, item in enumerate(all_backup_accounts, start=1):
+        sheet3.merge(row_num, row_num, 0, 3)
         sheet3.write(row_num, 0, item[0])  # Email
-        sheet3.write(row_num, 1, item[1])  # Пароль
-        sheet3.write(row_num, 2, item[2])  # Привязанные пользователи
+
+        sheet3.merge(row_num, row_num, 4, 7)
+        sheet3.write(row_num, 4, item[1])  # Пароль
+
+        sheet3.write(row_num, 8, item[2])  # Привязанные пользователи
 
     # Заголовки столбцов таблицы Users Data
     headers1 = ['Email', 'Привязан', 'Дата покупки', 'Дата окончания', 'Статус',
                 'Резервный аккаунт', 'Выдача резервного аккаунта', 'Потрачено']
-    for col_num, header in enumerate(headers1):
-        sheet.write(0, col_num, header)
+    col_num = 0
+    for header in headers1:
+        if header in ('Email', 'Привязан', 'Резервный аккаунт'):
+            sheet.merge(0, 0, col_num, col_num + 3)  # Объединяем 4 клетки для Email
+            sheet.write(0, col_num, header)  # Пишем заголовок в первую клетку объединенного диапазона
+            col_num += 4  # Увеличиваем индекс на 4 клетки
+        elif header in ('Дата покупки', 'Дата окончания', 'Статус'):
+            sheet.merge(0, 0, col_num, col_num + 1)  # Объединяем 2 клетки для Email
+            sheet.write(0, col_num, header)  # Пишем заголовок в первую клетку объединенного диапазона
+            col_num += 2  # Увеличиваем индекс на 2 клетки
+        else:
+            sheet.write(0, col_num, header)  # Пишем заголовок
+            col_num += 1  # Увеличиваем индекс
 
     # Заголовки столбцов таблицы Accounts
     headers2 = ['Email', 'Пароль', 'Привязанные пользоватлей', 'Недейств. пользователи']
-    for col_num, header in enumerate(headers2):
-        sheet2.write(0, col_num, header)
+    col_num = 0
+    for header in headers2:
+        if header in ('Email', 'Пароль'):
+            sheet2.merge(0, 0, col_num, col_num + 3)  # Объединяем 4 клетки для Email
+            sheet2.write(0, col_num, header)  # Пишем заголовок в первую клетку объединенного диапазона
+            col_num += 4  # Увеличиваем индекс на 4 клетки
+        else:
+            sheet2.write(0, col_num, header)  # Пишем заголовок
+            col_num += 1  # Увеличиваем индекс
     # Заполняем строки таблицы Accounts данными
     all_accounts = await get_emails_with_user_count()
     for row_num, item in enumerate(all_accounts, start=1):
+        sheet2.merge(row_num, row_num, 0, 3)
         sheet2.write(row_num, 0, item[0])  # Email
-        sheet2.write(row_num, 1, item[1])  # Пароль
-        sheet2.write(row_num, 2, item[2])  # Привязанные пользователи
-        sheet2.write(row_num, 3, await get_inactive_user_count_by_email(item[0]))  # Недействю пользователи
+        sheet2.merge(row_num, row_num, 4, 7)
+        sheet2.write(row_num, 4, item[1])  # Пароль
+        sheet2.write(row_num, 8, item[2])  # Привязанные пользователи
+        sheet2.write(row_num, 9, await get_inactive_user_count_by_email(item[0]))  # Недействю пользователи
 
     # Заполняем строки таблицы Users Data данными пользователей
     for row_num, item in enumerate(all_users, start=1):
@@ -73,14 +105,26 @@ async def get_data(message: types.Message):
         else:
             sub = 'Недействительна'
 
+        sheet.merge(row_num, row_num, 0, 3)
         sheet.write(row_num, 0, item[1])  # Email
-        sheet.write(row_num, 1, account)  # Привязан
-        sheet.write(row_num, 2, item[2])  # Дата покупки
-        sheet.write(row_num, 3, item[3])  # Дата окончания
-        sheet.write(row_num, 4, sub)  # Статус
-        sheet.write(row_num, 5, user_backup_account)  # Резервный аккаунт
-        sheet.write(row_num, 6, link_date)  # Выдача резервного аккаунта
-        sheet.write(row_num, 7, item[4])  # Потрачено
+
+        sheet.merge(row_num, row_num, 4, 7)
+        sheet.write(row_num, 4, account)  # Привязан
+
+        sheet.merge(row_num, row_num, 8, 9)
+        sheet.write(row_num, 8, item[2])  # Дата покупки
+
+        sheet.merge(row_num, row_num, 10, 11)
+        sheet.write(row_num, 10, item[3])  # Дата окончания
+
+        sheet.merge(row_num, row_num, 12, 13)
+        sheet.write(row_num, 12, sub)  # Статус
+
+        sheet.merge(row_num, row_num, 14, 17)
+        sheet.write(row_num, 14, user_backup_account)  # Резервный аккаунт
+
+        sheet.write(row_num, 18, link_date)  # Выдача резервного аккаунта
+        sheet.write(row_num, 19, item[4])  # Потрачено
 
     # Сохраняем Excel-файл
     workbook.save(file_path)

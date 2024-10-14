@@ -60,19 +60,24 @@ async def send_invoice(message: Message, bot: Bot, months: str):
     match months:
         case "1":
             price = 64900
-            description = 'Подписка ChatGPT+ на 1 месяц'
+            description = 'Совместный аккаунт «DECA»'
+            tariff = 'DECA'
         case "3":
             price = 174900
-            description = 'Подписка ChatGPT+ на 3 месяца'
+            description = 'Совместный аккаунт «DECA»'
+            tariff = 'DECA'
         case "6":
             price = 334900
-            description = 'Подписка ChatGPT+ на 6 месяцев'
+            description = 'Совместный аккаунт «DECA»'
+            tariff = 'DECA'
         case "ind":
             price = 250000
-            description = 'Индивидуальная подписка ChatGPT+ на 1 месяц'
+            description = 'Индивидуальный аккаунт «UNICO» — 1 месяц'
+            tariff = 'UNICO'
         case _:
             price = 0
             description = ''
+            tariff = ''
     # Отправляем инвойс
     await bot.send_invoice(
         chat_id=message.chat.id,
@@ -81,7 +86,7 @@ async def send_invoice(message: Message, bot: Bot, months: str):
         payload=f'subscription_{months}',  # Информация о подписке
         provider_token=config.provider_token.get_secret_value(),
         currency='RUB',
-        prices=[LabeledPrice(label='Доступ к подписке', amount=price)],
+        prices=[LabeledPrice(label=f'Тариф {tariff}', amount=price)],
         start_parameter='subscription_start',
         provider_data=None,
         photo_url=None,
