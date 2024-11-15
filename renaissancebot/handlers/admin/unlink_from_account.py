@@ -40,7 +40,7 @@ async def unlink_from_account_handler(message: types.Message, command: CommandOb
             return
 
         # Отвязываем пользователя от аккаунта
-        await unlink_user_from_account(user_id, account_email)
+        await unlink_user_from_account(user_id)
 
         # Отправляем сообщение о успешном отвязывании
         await message.answer("Пользователь успешно отвязан от аккаунта")
