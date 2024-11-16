@@ -1,5 +1,7 @@
 /.venv/
+/.virtualenvs/
 /.idea/
 .env
 poetry.lock
 renaissancebot/users_data.txt
+/amvera.yml
